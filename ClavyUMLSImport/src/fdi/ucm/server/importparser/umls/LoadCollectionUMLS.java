@@ -149,15 +149,15 @@ public class LoadCollectionUMLS extends LoadCollection{
 		CompleteCollectionAndLog Salida= new CompleteCollectionAndLog();
 		Salida.setLogLines(new ArrayList<String>());
 		
-		List<String> DocumentosList=new LinkedList<>();
-		List<String> DocumentosListText= new LinkedList<>();
+		List<String> DocumentosList=new LinkedList<String>();
+		List<String> DocumentosListText= new LinkedList<String>();
 		
-		HashMap<String, HashSet<String>> imagenes_Tabla=new HashMap<>();
+		HashMap<String, HashSet<String>> imagenes_Tabla=new HashMap<String, HashSet<String>>();
 		
-		HashMap<String, HashMap<String,List<HashMap<String,HashSet<String>>>>> Supertabla=new HashMap<>();
-		HashMap<String,HashMap<String,HashSet<String>>> SupertablaSemPos=new HashMap<>();
-		HashMap<String,HashMap<String,HashSet<String>>> SupertablaSemNeg=new HashMap<>();
-		HashMap<String,String> TablaSemanticaTexto=new HashMap<>();
+		HashMap<String, HashMap<String,List<HashMap<String,HashSet<String>>>>> Supertabla=new HashMap<String, HashMap<String,List<HashMap<String,HashSet<String>>>>>();
+		HashMap<String,HashMap<String,HashSet<String>>> SupertablaSemPos=new HashMap<String,HashMap<String,HashSet<String>>>();
+		HashMap<String,HashMap<String,HashSet<String>>> SupertablaSemNeg=new HashMap<String,HashMap<String,HashSet<String>>>();
+		HashMap<String,String> TablaSemanticaTexto=new HashMap<String,String>();
 		
 		System.out.println("//Procesando el Sample");
 		try {
@@ -409,7 +409,7 @@ TerrminosElem.put("CODE", CODE);
 		
 		
 		
-		HashSet<String> imagenesLinks = imagenes_Tabla.get(Iden);
+		HashSet<String> imagenesLinks = new HashSet<String>(imagenes_Tabla.get(Iden)) ;
 		
 		if (imagenesLinks != null)
 			{
@@ -534,6 +534,8 @@ TerrminosElem.put("CODE", CODE);
 	        System.out.println("//Procesando Resultado XML P1");
 			File file=new File(filein);
 			  DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			  	dbFactory.setValidating(false);
+			  	dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 				Document doc = dBuilder.parse(file);
 				//Pillo los documentos
