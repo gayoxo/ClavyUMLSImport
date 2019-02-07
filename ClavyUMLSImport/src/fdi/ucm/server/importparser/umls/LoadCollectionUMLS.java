@@ -1,17 +1,28 @@
 /**
  * 
  */
-package fdi.ucm.server.importparser.mesh;
+package fdi.ucm.server.importparser.umls;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -21,10 +32,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 
 import fdi.ucm.server.modelComplete.ImportExportDataEnum;
 import fdi.ucm.server.modelComplete.ImportExportPair;
@@ -44,7 +62,7 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
  * @author Joaquin Gayoso Cabada
  *
  */
-public class LoadCollectionMesH extends LoadCollection{
+public class LoadCollectionUMLS extends LoadCollection{
 
 	
 	private static ArrayList<ImportExportPair> Parametros;
@@ -58,31 +76,31 @@ public class LoadCollectionMesH extends LoadCollection{
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LoadCollectionMesH LC=new LoadCollectionMesH();
-		LoadCollectionMesH.consoleDebug=true;
+		LoadCollectionUMLS LC=new LoadCollectionUMLS();
+		LoadCollectionUMLS.consoleDebug=true;
 		
 		ArrayList<String> AA=new ArrayList<String>();
 		
 		CompleteCollectionAndLog Salida=null;
 		
-		if (args.length==0)
-			{
-			AA.add("MesH.zip");
-			AA.add(System.getProperty("user.home"));
+//		ArrayList<ImportExportPair> ListaCampos=new ArrayList<ImportExportPair>();
+//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents json File"));
+//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents String txt File"));
+//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "UMLS output File"));
+//		//ESTO ES MEJORABLE
+//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories txt",true));
+//		//Futuro
+//		//ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories cvs",true));
+//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Openi json File"));
+	
+		AA.add("salida_docs.json");
+		AA.add("sample.txt");
+		AA.add("salida.xml");
+		AA.add("terminos_filtrados.txt");
+		AA.add("openi_nlm_nih_gov.json");
+	
 			 Salida=LC.processCollecccion(AA);
-			}
-		else
-			{
-			String carpeta = args[0];
-			System.out.println(carpeta);
-			LinkedList<File> Archivos=new LinkedList<>();
-			 File destDir=new File(carpeta);
-			 if (destDir.exists())
-				 listFilesForFolder(destDir,Archivos);
-
-			Salida=LC.internalProcess(Archivos);
-			
-			}
+	
 			
 		
 		if (Salida!=null)
@@ -135,43 +153,99 @@ public class LoadCollectionMesH extends LoadCollection{
 	@Override
 	public CompleteCollectionAndLog processCollecccion(ArrayList<String> dateEntrada) {
 		
-		LinkedList<File> Archivos=new LinkedList<>();
 		
+		String Salida_Docs_File = dateEntrada.get(0);
+		String Sample_File = dateEntrada.get(1);
+		
+		CompleteCollectionAndLog Salida= new CompleteCollectionAndLog();
+		Salida.setLogLines(new ArrayList<String>());
+		
+		List<String> documentosList=new LinkedList<>();
+		List<String> documentosListText= new LinkedList<>();
+		
+		HashMap<String, HashSet<String>> imagenes_Tabla;
+		
+		HashMap<String, HashMap<String,List<HashMap<String,HashSet<String>>>>> Supertabla=new HashMap<>();
+		HashMap<String,HashMap<String,HashSet<String>>> SupertablaSemPos=new HashMap<>();
+		HashMap<String,HashMap<String,HashSet<String>>> SupertablaSemNeg=new HashMap<>();
+		HashMap<String,String> TablaSemanticaTexto=new HashMap<>();
+		
+		System.out.println("//Procesando el Sample");
 		try {
-			String fileZip = dateEntrada.get(0);
-	        File destDir = new File(dateEntrada.get(1)+"/"+System.nanoTime()+"/");
-	        destDir.mkdirs();
-	        byte[] buffer = new byte[1024];
-	        ZipInputStream zis = new ZipInputStream(new FileInputStream(fileZip));
-	        ZipEntry zipEntry = zis.getNextEntry();
-	        while (zipEntry != null) {
-	            File newFile = newFile(destDir, zipEntry);
-	            FileOutputStream fos = new FileOutputStream(newFile);
-	            int len;
-	            while ((len = zis.read(buffer)) > 0) {
-	                fos.write(buffer, 0, len);
-	            }
-	            fos.close();
-	            zipEntry = zis.getNextEntry();
-	            if (newFile.getAbsolutePath().endsWith(".xml"))
-	            	Archivos.add(newFile);
-	           
-	        }
-	        zis.closeEntry();
-	        zis.close();
+			 JsonReader reader = new JsonReader(new FileReader(Salida_Docs_File));
+				Gson gson = new Gson();
+				List<String> T =  gson.fromJson(reader, List.class);
+
+				documentosList.addAll(T);
+				
+			    String line = "";
+
+			    try (BufferedReader br = new BufferedReader(new FileReader(Sample_File))) {
+
+			        while ((line = br.readLine()) != null) {
+
+			        	if (!line.isEmpty())
+			        		documentosListText.add(line);
+			        	// use comma as separator
+			        }
+
+			    } catch (IOException e) {
+			        e.printStackTrace();
+			        throw new RuntimeException("Error en la lectura del sample");
+			    }
+				
+			    if (documentosList.size()!=documentosListText.size())
+			    	throw new RuntimeException("Error en la lectura del sample");
 		} catch (Exception e) {
 			e.printStackTrace();
+			Salida.getLogLines().add("Error en la lectura del sample");
+			Salida.getLogLines().add("IRRECUPERABLE");
+			return Salida;
 		}
 		
-		return internalProcess(Archivos);
+		System.out.println("//Procesando las imagenes");
+		try {
+			imagenes_Tabla= processImagenes();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Salida.getLogLines().add("El archivo de procesado de imagenes no esta, me lo intento descargar");
+			Salida.getLogLines().add("->Se continuara sin imagenes");
+		}
 		
+		System.out.println("//Procesando la salida");
 		
+		return Salida;
 		
-		
+
 	}
 
 	
 
+	private static HashMap<String, HashSet<String>> processImagenes() {
+
+
+		   
+		   
+		
+		   JsonReader reader;
+		try {
+			reader = new JsonReader(new FileReader( "openi_nlm_nih_gov.json"));
+			Gson gson = new Gson();
+			HashMap<String, HashSet<String>> Imagenes_List =  gson.fromJson(reader, HashMap.class);
+			
+			System.out.println("Cargada");
+			return Imagenes_List;
+			
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+			System.err.println("El archivo no esta, me lo intento descargar");
+			throw new RuntimeException("El archivo no esta, me lo intento descargar");
+		}
+   
+	}
+	
+	
+	
 	private CompleteCollectionAndLog internalProcess(LinkedList<File> Archivos) {
 		CompleteCollectionAndLog Salida=new CompleteCollectionAndLog();
 		CC=new CompleteCollection("MESH IMPORT", new Date()+"");
@@ -496,7 +570,14 @@ CompleteResourceElementType imageURL = new CompleteResourceElementType("Image", 
 		if (Parametros==null)
 		{
 			ArrayList<ImportExportPair> ListaCampos=new ArrayList<ImportExportPair>();
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "XML zip File"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents json File"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents String txt File"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "UMLS output File"));
+			//ESTO ES MEJORABLE
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories txt",true));
+			//Futuro
+			//ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories cvs",true));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Openi json File"));
 			Parametros=ListaCampos;
 			return ListaCampos;
 		}
