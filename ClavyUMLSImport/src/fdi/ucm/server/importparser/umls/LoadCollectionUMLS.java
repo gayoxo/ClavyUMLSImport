@@ -532,7 +532,6 @@ TerrminosElem.put("CODE", CODE);
 		
 		
 	        System.out.println("//Procesando Resultado XML P1");
-		
 			File file=new File(filein);
 			  DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
