@@ -6,18 +6,14 @@ package fdi.ucm.server.importparser.umls;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,23 +31,13 @@ import com.google.gson.stream.JsonReader;
 import fdi.ucm.server.modelComplete.ImportExportDataEnum;
 import fdi.ucm.server.modelComplete.ImportExportPair;
 import fdi.ucm.server.modelComplete.LoadCollection;
-import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
-import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
-import fdi.ucm.server.modelComplete.collection.document.CompleteLinkElement;
-import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementURL;
-import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 
 /**
  * @author Joaquin Gayoso Cabada
  *
  */
-public class LoadCollectionUMLS extends LoadCollection{
+public abstract class LoadCollectionUMLS extends LoadCollection{
 
 	
 	private static ArrayList<ImportExportPair> Parametros;
@@ -59,81 +45,70 @@ public class LoadCollectionUMLS extends LoadCollection{
 	
 	
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		LoadCollectionUMLS LC=new LoadCollectionUMLS();
-		LoadCollectionUMLS.consoleDebug=true;
-		
-		ArrayList<String> AA=new ArrayList<String>();
-		
-		CompleteCollectionAndLog Salida=null;
-		
-//		ArrayList<ImportExportPair> ListaCampos=new ArrayList<ImportExportPair>();
-//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents json File"));
-//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents String txt File"));
-//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "UMLS output File"));
-//		//ESTO ES MEJORABLE
-//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories txt",true));
-//		//Futuro
-//		//ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories cvs",true));
-//		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Openi json File"));
+//	/**
+//	 * @param args
+//	 */
+//	public static void main(String[] args) {
+//		LoadCollectionUMLS LC=new LoadCollectionUMLS();
+//		LoadCollectionUMLS.consoleDebug=true;
+//		
+//		ArrayList<String> AA=new ArrayList<String>();
+//		
+//		CompleteCollectionAndLog Salida=null;
+//		
+////		ArrayList<ImportExportPair> ListaCampos=new ArrayList<ImportExportPair>();
+////		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents json File"));
+////		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents String txt File"));
+////		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "UMLS output File"));
+////		//ESTO ES MEJORABLE
+////		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories txt",true));
+////		//Futuro
+////		//ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories cvs",true));
+////		ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Openi json File"));
+//	
+//		AA.add("salida_docs.json");
+//		AA.add("sample.txt");
+//		AA.add("salida.xml");
+//		AA.add("terminos_filtrados.txt");
+//		AA.add("openi_nlm_nih_gov.json");
+//	
+//			 Salida=LC.processCollecccion(AA);
+//	
+//			
+//		
+//		if (Salida!=null)
+//			{
+//			
+//			System.out.println("Correcto");
+//			
+//			for (String warning : Salida.getLogLines())
+//				System.err.println(warning);
+//
+//			
+//			try {
+//				String FileIO = System.getProperty("user.home")+"/"+System.currentTimeMillis()+".clavy";
+//				
+//				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FileIO));
+//
+//				oos.writeObject(Salida.getCollection());
+//
+//				oos.close();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			
+//			
+//			System.exit(0);
+//			
+//			}
+//		else
+//			{
+//			System.err.println("Error");
+//			System.exit(-1);
+//			}
+//	}
+
 	
-		AA.add("salida_docs.json");
-		AA.add("sample.txt");
-		AA.add("salida.xml");
-		AA.add("terminos_filtrados.txt");
-		AA.add("openi_nlm_nih_gov.json");
-	
-			 Salida=LC.processCollecccion(AA);
-	
-			
-		
-		if (Salida!=null)
-			{
-			
-			System.out.println("Correcto");
-			
-			for (String warning : Salida.getLogLines())
-				System.err.println(warning);
-
-			
-			try {
-				String FileIO = System.getProperty("user.home")+"/"+System.currentTimeMillis()+".clavy";
-				
-				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FileIO));
-
-				oos.writeObject(Salida.getCollection());
-
-				oos.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			
-			System.exit(0);
-			
-			}
-		else
-			{
-			System.err.println("Error");
-			System.exit(-1);
-			}
-	}
-
-	
-	public static void listFilesForFolder(File folder, LinkedList<File> archivos) {
-	    for (File fileEntry : folder.listFiles()) {
-	        if (fileEntry.isDirectory()) {
-	            listFilesForFolder(fileEntry,archivos);
-	        } else {
-	        	 if (fileEntry.getAbsolutePath().endsWith(".xml"))
-	        	 	archivos.add(fileEntry);
-
-	        }
-	    }
-	}
 	
 	
 	
@@ -225,224 +200,227 @@ public class LoadCollectionUMLS extends LoadCollection{
 
 	
 	
+	protected abstract CompleteCollectionAndLog processCollecccion(List<String> documentosList, List<String> documentosListText,
+			   HashMap<String, HashMap<String, List<HashMap<String, HashSet<String>>>>> supertabla,
+			   HashMap<String, HashMap<String, HashSet<String>>> supertablaSemPos, HashMap<String, String> TablaSemanticaTexto,
+			   HashMap<String, HashSet<String>> imagenes_Tabla, CompleteCollectionAndLog Salida);
 	
 	
-	
-	private CompleteCollectionAndLog processCollecccion(List<String> documentosList, List<String> documentosListText,
-		   HashMap<String, HashMap<String, List<HashMap<String, HashSet<String>>>>> supertabla,
-		   HashMap<String, HashMap<String, HashSet<String>>> supertablaSemPos, HashMap<String, String> TablaSemanticaTexto,
-		   HashMap<String, HashSet<String>> imagenes_Tabla, CompleteCollectionAndLog Salida) {
-	
-	CompleteCollection C=new CompleteCollection("MetaMap ", "MetaMap  collection");
-	Salida.setCollection(C);
-	
-	
-	HashMap<CompleteGrammar,HashMap<String, CompleteElementType>> TablaElem=new HashMap<>();
-	
-	CompleteGrammar Terminos=new CompleteGrammar("Terms", "Terms Clasification",Salida.getCollection());
-	C.getMetamodelGrammar().add(Terminos);
-	
-	
-	//Tabajamos los terminos
-	
-	HashMap<String, CompleteElementType> TerrminosElem= new HashMap<String, CompleteElementType>();
-	
-	CompleteTextElementType Nombre=new CompleteTextElementType("Name",Terminos);
-	Terminos.getSons().add(Nombre);
-	
-	TerrminosElem.put("Name", Nombre);
-	
-	CompleteTextElementType Categoria=new CompleteTextElementType("Category",Terminos);
-	Terminos.getSons().add(Categoria);
-	Categoria.setBrowseable(true);
-	
-	TerrminosElem.put("Category", Categoria);
-	
-	CompleteTextElementType Words=new CompleteTextElementType("Words",Terminos);
-	Terminos.getSons().add(Words);
-	Words.setMultivalued(true);
-	
-	TerrminosElem.put("Words", Words);
-	
-	List<CompleteTextElementType> WordsList=new ArrayList<>();
-	WordsList.add(Words);
-	
-	
-	HashMap<CompleteDocuments, Integer> actualInforme=new HashMap<>();
-	
-	 HashMap<String, HashMap<String, CompleteDocuments>> supertablaSemPos_Doc=new HashMap<>();
-		
-	String icon="https://www.freeiconspng.com/uploads/blank-price-tag-png-11.png"; 
-	 
-	for (Entry<String, HashMap<String, HashSet<String>>> semantica_word : supertablaSemPos.entrySet()) {
-			
-		
-		HashMap<String, CompleteDocuments> String_doc=new HashMap<>();
-		
-		for (Entry<String, HashSet<String>> word_wfound : semantica_word.getValue().entrySet()) {
-				CompleteDocuments WordInstance=new CompleteDocuments(C, semantica_word.getKey()+"->"+word_wfound.getKey(), icon);
-				C.getEstructuras().add(WordInstance);
-				
-				CompleteTextElement NameI=new CompleteTextElement(Nombre, word_wfound.getKey());
-				WordInstance.getDescription().add(NameI);
-				
-				CompleteTextElement CateI=new CompleteTextElement(Categoria, TablaSemanticaTexto.get(semantica_word.getKey()));
-				WordInstance.getDescription().add(CateI);
-				
-				HashSet<String> ListaW = word_wfound.getValue();
-				
-				List<String> ListaWW=new LinkedList<>(ListaW);
-				
-				while (WordsList.size()<ListaWW.size())
-					{
-					CompleteTextElementType WordsI=new CompleteTextElementType("Words",Terminos);
-					Terminos.getSons().add(WordsI);
-					WordsI.setMultivalued(true);
-					WordsI.setClassOfIterator(Words);
-					WordsList.add(WordsI);
-					}
-				
-				for (int i = 0; i < ListaWW.size(); i++) {
-					String string = ListaWW.get(i);
-					CompleteTextElement wordI=new CompleteTextElement(WordsList.get(i), string);
-					WordInstance.getDescription().add(wordI);
-					
-				}
-				
-				actualInforme.put(WordInstance, new Integer(0));
-				
-				String_doc.put(word_wfound.getKey(), WordInstance);
-			}
-		
-		supertablaSemPos_Doc.put(semantica_word.getKey(), String_doc);
-	}
-	
-	
-	CompleteLinkElementType Reports=new CompleteLinkElementType("Reports",Terminos);
-	Terminos.getSons().add(Reports);
-	Reports.setMultivalued(true);
-	
-	TerrminosElem.put("Reports", Reports);
-	
-	List<CompleteLinkElementType> RepordList=new ArrayList<>();
-	RepordList.add(Reports);
-	
-	TablaElem.put(Terminos,TerrminosElem);
-
-	
-	CompleteGrammar ReportsG=new CompleteGrammar("Reports", "Reports Clasification",Salida.getCollection());
-	C.getMetamodelGrammar().add(ReportsG);
-	
-	//Tabajamos los Informes
-	
-HashMap<String, CompleteElementType> ReportsElem= new HashMap<String, CompleteElementType>();
-	
-
-CompleteTextElementType CODE=new CompleteTextElementType("CODE",ReportsG);
-ReportsG.getSons().add(CODE);
-
-TerrminosElem.put("CODE", CODE);
-
-	CompleteTextElementType Description=new CompleteTextElementType("Description",ReportsG);
-	ReportsG.getSons().add(Description);
-	
-	ReportsElem.put("Description", Description);
-	
-	
-	CompleteResourceElementType Images=new CompleteResourceElementType("Images",ReportsG);
-	ReportsG.getSons().add(Images);
-	Images.setMultivalued(true);
-	
-	ReportsElem.put("Images", Images);
-	
-	List<CompleteResourceElementType> ImagenesList=new ArrayList<>();
-	ImagenesList.add(Images);
-	
-	
-	TablaElem.put(ReportsG, ReportsElem);
-	
-	
-	
-	String DocIcon="https://www.freeiconspng.com/uploads/document-icon-10.jpg";
-	
-	for (int i = 0; i < documentosList.size(); i++) {
-	String Iden = documentosList.get(i);
-		HashMap<String, List<HashMap<String, HashSet<String>>>> Table = supertabla.get(Iden);
-		CompleteDocuments Doc=new CompleteDocuments(C,documentosListText.get(i) , DocIcon);
-		C.getEstructuras().add(Doc);
-		
-		CompleteTextElement IDEN=new CompleteTextElement(CODE, Iden);
-		Doc.getDescription().add(IDEN);
-		
-		CompleteTextElement DESC=new CompleteTextElement(Description, documentosListText.get(i) );
-		Doc.getDescription().add(DESC);
-		
-		if (Table!=null)
-		
-		for (Entry<String, List<HashMap<String, HashSet<String>>>> semantica_word_doc : Table.entrySet()) {
-			//TODO Es el 1 o el 2?
-			for (Entry<String, HashSet<String>> completeLinkElementType : semantica_word_doc.getValue().get(0).entrySet()) {
-					CompleteDocuments WordS=supertablaSemPos_Doc.get(semantica_word_doc.getKey()).get(completeLinkElementType.getKey());
-					Integer Informes_Doc = actualInforme.get(WordS);
-					
-					if (Informes_Doc==null)
-						System.out.println("AA");
-					
-					while (RepordList.size()<=Informes_Doc)
-					{
-						
-					CompleteLinkElementType ReportsI=new CompleteLinkElementType("Reports",Terminos);
-					Terminos.getSons().add(ReportsI);
-					ReportsI.setMultivalued(true);
-					ReportsI.setClassOfIterator(Reports);
-					RepordList.add(ReportsI);
-					
-					}
-					
-					CompleteLinkElement CLE=new CompleteLinkElement(RepordList.get(Informes_Doc), Doc);
-					WordS.getDescription().add(CLE);
-					
-					actualInforme.put(WordS, new Integer(Informes_Doc.intValue()+1));
-					
-			}
-		}
-		
-		
-		
-		HashSet<String> imagenesLinks = new HashSet<String>(imagenes_Tabla.get(Iden)) ;
-		
-		if (imagenesLinks != null)
-			{
-			
-			LinkedList<String> imagenesLinksList = new LinkedList<String>(imagenesLinks);
-			
-			while (ImagenesList.size()<imagenesLinksList.size())
-			{
-		
-				CompleteResourceElementType ImagesI=new CompleteResourceElementType("Images",ReportsG);
-				ReportsG.getSons().add(ImagesI);
-				ImagesI.setMultivalued(true);
-				ImagesI.setClassOfIterator(Images);
-				ImagenesList.add(ImagesI);
-			}
-			
-			
-			for (int j = 0; j < imagenesLinks.size(); j++) {
-				CompleteResourceElementURL CLE=new CompleteResourceElementURL(ImagenesList.get(j), imagenesLinksList.get(j));
-				Doc.getDescription().add(CLE);
-			}
-			
-			
-			
-			}
-			
-		
-		
-		//AQUI QUEdan las imagenes
-	}
-	
-	return Salida;
-}
+//	private CompleteCollectionAndLog processCollecccion(List<String> documentosList, List<String> documentosListText,
+//		   HashMap<String, HashMap<String, List<HashMap<String, HashSet<String>>>>> supertabla,
+//		   HashMap<String, HashMap<String, HashSet<String>>> supertablaSemPos, HashMap<String, String> TablaSemanticaTexto,
+//		   HashMap<String, HashSet<String>> imagenes_Tabla, CompleteCollectionAndLog Salida) {
+//	
+//	CompleteCollection C=new CompleteCollection("MetaMap ", "MetaMap  collection");
+//	Salida.setCollection(C);
+//	
+//	
+//	HashMap<CompleteGrammar,HashMap<String, CompleteElementType>> TablaElem=new HashMap<>();
+//	
+//	CompleteGrammar Terminos=new CompleteGrammar("Terms", "Terms Clasification",Salida.getCollection());
+//	C.getMetamodelGrammar().add(Terminos);
+//	
+//	
+//	//Tabajamos los terminos
+//	
+//	HashMap<String, CompleteElementType> TerrminosElem= new HashMap<String, CompleteElementType>();
+//	
+//	CompleteTextElementType Nombre=new CompleteTextElementType("Name",Terminos);
+//	Terminos.getSons().add(Nombre);
+//	
+//	TerrminosElem.put("Name", Nombre);
+//	
+//	CompleteTextElementType Categoria=new CompleteTextElementType("Category",Terminos);
+//	Terminos.getSons().add(Categoria);
+//	Categoria.setBrowseable(true);
+//	
+//	TerrminosElem.put("Category", Categoria);
+//	
+//	CompleteTextElementType Words=new CompleteTextElementType("Words",Terminos);
+//	Terminos.getSons().add(Words);
+//	Words.setMultivalued(true);
+//	
+//	TerrminosElem.put("Words", Words);
+//	
+//	List<CompleteTextElementType> WordsList=new ArrayList<>();
+//	WordsList.add(Words);
+//	
+//	
+//	HashMap<CompleteDocuments, Integer> actualInforme=new HashMap<>();
+//	
+//	 HashMap<String, HashMap<String, CompleteDocuments>> supertablaSemPos_Doc=new HashMap<>();
+//		
+//	String icon="https://www.freeiconspng.com/uploads/blank-price-tag-png-11.png"; 
+//	 
+//	for (Entry<String, HashMap<String, HashSet<String>>> semantica_word : supertablaSemPos.entrySet()) {
+//			
+//		
+//		HashMap<String, CompleteDocuments> String_doc=new HashMap<>();
+//		
+//		for (Entry<String, HashSet<String>> word_wfound : semantica_word.getValue().entrySet()) {
+//				CompleteDocuments WordInstance=new CompleteDocuments(C, semantica_word.getKey()+"->"+word_wfound.getKey(), icon);
+//				C.getEstructuras().add(WordInstance);
+//				
+//				CompleteTextElement NameI=new CompleteTextElement(Nombre, word_wfound.getKey());
+//				WordInstance.getDescription().add(NameI);
+//				
+//				CompleteTextElement CateI=new CompleteTextElement(Categoria, TablaSemanticaTexto.get(semantica_word.getKey()));
+//				WordInstance.getDescription().add(CateI);
+//				
+//				HashSet<String> ListaW = word_wfound.getValue();
+//				
+//				List<String> ListaWW=new LinkedList<>(ListaW);
+//				
+//				while (WordsList.size()<ListaWW.size())
+//					{
+//					CompleteTextElementType WordsI=new CompleteTextElementType("Words",Terminos);
+//					Terminos.getSons().add(WordsI);
+//					WordsI.setMultivalued(true);
+//					WordsI.setClassOfIterator(Words);
+//					WordsList.add(WordsI);
+//					}
+//				
+//				for (int i = 0; i < ListaWW.size(); i++) {
+//					String string = ListaWW.get(i);
+//					CompleteTextElement wordI=new CompleteTextElement(WordsList.get(i), string);
+//					WordInstance.getDescription().add(wordI);
+//					
+//				}
+//				
+//				actualInforme.put(WordInstance, new Integer(0));
+//				
+//				String_doc.put(word_wfound.getKey(), WordInstance);
+//			}
+//		
+//		supertablaSemPos_Doc.put(semantica_word.getKey(), String_doc);
+//	}
+//	
+//	
+//	CompleteLinkElementType Reports=new CompleteLinkElementType("Reports",Terminos);
+//	Terminos.getSons().add(Reports);
+//	Reports.setMultivalued(true);
+//	
+//	TerrminosElem.put("Reports", Reports);
+//	
+//	List<CompleteLinkElementType> RepordList=new ArrayList<>();
+//	RepordList.add(Reports);
+//	
+//	TablaElem.put(Terminos,TerrminosElem);
+//
+//	
+//	CompleteGrammar ReportsG=new CompleteGrammar("Reports", "Reports Clasification",Salida.getCollection());
+//	C.getMetamodelGrammar().add(ReportsG);
+//	
+//	//Tabajamos los Informes
+//	
+//HashMap<String, CompleteElementType> ReportsElem= new HashMap<String, CompleteElementType>();
+//	
+//
+//CompleteTextElementType CODE=new CompleteTextElementType("CODE",ReportsG);
+//ReportsG.getSons().add(CODE);
+//
+//TerrminosElem.put("CODE", CODE);
+//
+//	CompleteTextElementType Description=new CompleteTextElementType("Description",ReportsG);
+//	ReportsG.getSons().add(Description);
+//	
+//	ReportsElem.put("Description", Description);
+//	
+//	
+//	CompleteResourceElementType Images=new CompleteResourceElementType("Images",ReportsG);
+//	ReportsG.getSons().add(Images);
+//	Images.setMultivalued(true);
+//	
+//	ReportsElem.put("Images", Images);
+//	
+//	List<CompleteResourceElementType> ImagenesList=new ArrayList<>();
+//	ImagenesList.add(Images);
+//	
+//	
+//	TablaElem.put(ReportsG, ReportsElem);
+//	
+//	
+//	
+//	String DocIcon="https://www.freeiconspng.com/uploads/document-icon-10.jpg";
+//	
+//	for (int i = 0; i < documentosList.size(); i++) {
+//	String Iden = documentosList.get(i);
+//		HashMap<String, List<HashMap<String, HashSet<String>>>> Table = supertabla.get(Iden);
+//		CompleteDocuments Doc=new CompleteDocuments(C,documentosListText.get(i) , DocIcon);
+//		C.getEstructuras().add(Doc);
+//		
+//		CompleteTextElement IDEN=new CompleteTextElement(CODE, Iden);
+//		Doc.getDescription().add(IDEN);
+//		
+//		CompleteTextElement DESC=new CompleteTextElement(Description, documentosListText.get(i) );
+//		Doc.getDescription().add(DESC);
+//		
+//		if (Table!=null)
+//		
+//		for (Entry<String, List<HashMap<String, HashSet<String>>>> semantica_word_doc : Table.entrySet()) {
+//			//TODO Es el 1 o el 2?
+//			for (Entry<String, HashSet<String>> completeLinkElementType : semantica_word_doc.getValue().get(0).entrySet()) {
+//					CompleteDocuments WordS=supertablaSemPos_Doc.get(semantica_word_doc.getKey()).get(completeLinkElementType.getKey());
+//					Integer Informes_Doc = actualInforme.get(WordS);
+//					
+//					if (Informes_Doc==null)
+//						System.out.println("AA");
+//					
+//					while (RepordList.size()<=Informes_Doc)
+//					{
+//						
+//					CompleteLinkElementType ReportsI=new CompleteLinkElementType("Reports",Terminos);
+//					Terminos.getSons().add(ReportsI);
+//					ReportsI.setMultivalued(true);
+//					ReportsI.setClassOfIterator(Reports);
+//					RepordList.add(ReportsI);
+//					
+//					}
+//					
+//					CompleteLinkElement CLE=new CompleteLinkElement(RepordList.get(Informes_Doc), Doc);
+//					WordS.getDescription().add(CLE);
+//					
+//					actualInforme.put(WordS, new Integer(Informes_Doc.intValue()+1));
+//					
+//			}
+//		}
+//		
+//		
+//		
+//		HashSet<String> imagenesLinks = new HashSet<String>(imagenes_Tabla.get(Iden)) ;
+//		
+//		if (imagenesLinks != null)
+//			{
+//			
+//			LinkedList<String> imagenesLinksList = new LinkedList<String>(imagenesLinks);
+//			
+//			while (ImagenesList.size()<imagenesLinksList.size())
+//			{
+//		
+//				CompleteResourceElementType ImagesI=new CompleteResourceElementType("Images",ReportsG);
+//				ReportsG.getSons().add(ImagesI);
+//				ImagesI.setMultivalued(true);
+//				ImagesI.setClassOfIterator(Images);
+//				ImagenesList.add(ImagesI);
+//			}
+//			
+//			
+//			for (int j = 0; j < imagenesLinks.size(); j++) {
+//				CompleteResourceElementURL CLE=new CompleteResourceElementURL(ImagenesList.get(j), imagenesLinksList.get(j));
+//				Doc.getDescription().add(CLE);
+//			}
+//			
+//			
+//			
+//			}
+//			
+//		
+//		
+//		//AQUI QUEdan las imagenes
+//	}
+//	
+//	return Salida;
+//}
 
 
 	private static void procesaSalida(String filein, String terminos_Filtrados_File, List<String> Lista, List<String> documentosListTextIn,
@@ -788,20 +766,7 @@ TerrminosElem.put("CODE", CODE);
    
 	}
 
-	public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-         
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-         
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-         
-        return destFile;
-    }
 	
-
 	@Override
 	public ArrayList<ImportExportPair> getConfiguracion() {
 		if (Parametros==null)
