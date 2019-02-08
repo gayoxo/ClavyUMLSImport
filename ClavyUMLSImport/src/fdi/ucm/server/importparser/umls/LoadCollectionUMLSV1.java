@@ -6,11 +6,13 @@ package fdi.ucm.server.importparser.umls;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
@@ -138,21 +140,18 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	report.setMultivalued(true);
 	TerrminosElem.put("Report*", report);
 	
-	CompleteTextElementType Words=new CompleteTextElementType("Words",Terminos);
+	CompleteTextElementType Words=new CompleteTextElementType("Words",report,Terminos);
 	report.getSons().add(Words);
 	
 	TerrminosElem.put("Words", Words);
 	
-	CompleteLinkElementType report_Link=new CompleteLinkElementType("Report Link",Terminos);
+	CompleteLinkElementType report_Link=new CompleteLinkElementType("Report Link",report,Terminos);
 	report.getSons().add(report_Link);
 	
 	TerrminosElem.put("Report Link", report_Link);
 	
-	List<CompleteTextElementType> wordsList=new ArrayList<>();
-	wordsList.add(Words);
-	
-	List<CompleteLinkElementType> reportList=new ArrayList<>();
-	reportList.add(report_Link);
+	List<CompleteTextElementType> reportList=new ArrayList<>();
+	reportList.add(report);
 	
 	TablaElem.put(Terminos,TerrminosElem);
 	
@@ -171,16 +170,14 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	ReportsElem.put("Description", Description);
 	
 	CompleteLinkElementType cEntry=new CompleteLinkElementType("CEntry*",Terminos);
-	ReportsG.getSons().add(cEntry);
-	
+	cEntry.setMultivalued(true);
 	ReportsElem.put("CEntry*", cEntry);
 	
 	
-	CompleteResourceElementType image=new CompleteResourceElementType("Image*",ReportsG);
-	ReportsG.getSons().add(image);
+	CompleteResourceElementType image=new CompleteResourceElementType("Images",ReportsG);
 	image.setMultivalued(true);
 	
-	ReportsElem.put("Image*", image);
+	ReportsElem.put("Images", image);
 	
 	List<CompleteResourceElementType> ImagenesList=new ArrayList<>();
 	ImagenesList.add(image);
@@ -191,10 +188,16 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	TablaElem.put(ReportsG, ReportsElem);
 	
 	HashMap<String, HashMap<String, CompleteDocuments>> supertablaSemPos_Doc=new HashMap<>();
+	HashMap<String, HashMap<String, CompleteDocuments>> supertablaSemNeg_Doc=new HashMap<>();
+	
+	
 	
 	String DocIcon="https://www.freeiconspng.com/uploads/document-icon-10.jpg";
 //	String icon="https://www.freeiconspng.com/uploads/blank-price-tag-png-11.png"; 
 	String iconEntry="https://www.freeiconspng.com/uploads/blank-price-tag-png-11.png"; 
+	
+	HashMap<CompleteDocuments, Integer> entry_docum_cnt = new HashMap<>();
+	HashMap<CompleteDocuments, Integer> docum_entry_cnt = new HashMap<>();
 	
 	for (int i = 0; i < documentosList.size(); i++) {
 	String Iden = documentosList.get(i);
@@ -206,6 +209,8 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 		CompleteTextElement DESC=new CompleteTextElement(Description, documentosListText.get(i) );
 		Doc.getDescription().add(DESC);
 		
+		
+		
 		if (Table!=null)
 		{
 			for (Entry<String, List<HashMap<String, HashSet<String>>>> semantica_word_doc : Table.entrySet()) {
@@ -213,192 +218,125 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 				String categoria = semantica_word_doc.getKey();
 				
 				//Positivos
-				for (Entry<String, HashSet<String>> completeLinkElementType : semantica_word_doc.getValue().get(0).entrySet()) {
-					
-					
-					HashMap<String, CompleteDocuments> term_Sem=supertablaSemPos_Doc.get(categoria);
-					String cEntryTerm=completeLinkElementType.getKey();
-					
-					if (term_Sem==null)
+				
+				for (int j = 0; j < semantica_word_doc.getValue().size(); j++) {
+					for (Entry<String, HashSet<String>> completeLinkElementType : semantica_word_doc.getValue().get(j).entrySet()) {
+						
+						
+						HashMap<String, CompleteDocuments> term_Sem;
+						String cEntryTerm;
+						
+						if (j==0)
 						{
-						term_Sem=new HashMap<>();
-						supertablaSemPos_Doc.put(categoria,term_Sem);
+							term_Sem=supertablaSemPos_Doc.get(categoria);
+							cEntryTerm=completeLinkElementType.getKey();
+							
+							if (term_Sem==null)
+								{
+								term_Sem=new HashMap<>();
+								supertablaSemPos_Doc.put(categoria,term_Sem);
+								}
+						
+						}else
+						{
+							term_Sem=supertablaSemNeg_Doc.get(categoria);
+							cEntryTerm=completeLinkElementType.getKey();
+							
+							if (term_Sem==null)
+								{
+								term_Sem=new HashMap<>();
+								supertablaSemNeg_Doc.put(categoria,term_Sem);
+								}
 						}
 						
-					CompleteDocuments WordInstance=term_Sem.get(cEntryTerm);
-					
-					if (WordInstance==null)
-						{
-							WordInstance=new CompleteDocuments(C, cEntryTerm + " (+)", iconEntry);
-							C.getEstructuras().add(WordInstance);
-							term_Sem.put(cEntryTerm, WordInstance);
-						}
-					
-					
-					
-					
-					
-				}
-				
-				//Negativos
-				for (Entry<String, HashSet<String>> completeLinkElementType : semantica_word_doc.getValue().get(1).entrySet()) {
-					
-					
-				}
-			}
-		}
-		
-		
-		
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	HashMap<CompleteDocuments, Integer> actualInforme=new HashMap<>();
-	
-	 HashMap<String, HashMap<String, CompleteDocuments>> supertablaSemPos_Doc=new HashMap<>();
-		
-	String icon="https://www.freeiconspng.com/uploads/blank-price-tag-png-11.png"; 
-	 
-	for (Entry<String, HashMap<String, HashSet<String>>> semantica_word : supertablaSemPos.entrySet()) {
-			
-		
-		HashMap<String, CompleteDocuments> String_doc=new HashMap<>();
-		
-		for (Entry<String, HashSet<String>> word_wfound : semantica_word.getValue().entrySet()) {
-				CompleteDocuments WordInstance=new CompleteDocuments(C, semantica_word.getKey()+"->"+word_wfound.getKey(), icon);
-				C.getEstructuras().add(WordInstance);
-				
-				CompleteTextElement NameI=new CompleteTextElement(occurrence, word_wfound.getKey());
-				WordInstance.getDescription().add(NameI);
-				
-				CompleteTextElement CateI=new CompleteTextElement(report, TablaSemanticaTexto.get(semantica_word.getKey()));
-				WordInstance.getDescription().add(CateI);
-				
-				HashSet<String> ListaW = word_wfound.getValue();
-				
-				List<String> ListaWW=new LinkedList<>(ListaW);
-				
-				while (cEntryList.size()<ListaWW.size())
-					{
-					CompleteTextElementType WordsI=new CompleteTextElementType("Words",Terminos);
-					Terminos.getSons().add(WordsI);
-					WordsI.setMultivalued(true);
-					WordsI.setClassOfIterator(cEntry);
-					cEntryList.add(WordsI);
-					}
-				
-				for (int i = 0; i < ListaWW.size(); i++) {
-					String string = ListaWW.get(i);
-					CompleteTextElement wordI=new CompleteTextElement(cEntryList.get(i), string);
-					WordInstance.getDescription().add(wordI);
-					
-				}
-				
-				actualInforme.put(WordInstance, new Integer(0));
-				
-				String_doc.put(word_wfound.getKey(), WordInstance);
-			}
-		
-		supertablaSemPos_Doc.put(semantica_word.getKey(), String_doc);
-	}
-	
-	
-	CompleteLinkElementType Reports=new CompleteLinkElementType("Reports",Terminos);
-	Terminos.getSons().add(Reports);
-	Reports.setMultivalued(true);
-	
-	TerrminosElem.put("Reports", Reports);
-	
-	List<CompleteLinkElementType> RepordList=new ArrayList<>();
-	RepordList.add(Reports);
-	
-	TablaElem.put(Terminos,TerrminosElem);
-
-	
-	CompleteGrammar ReportsG=new CompleteGrammar("Reports", "Reports Clasification",Salida.getCollection());
-	C.getMetamodelGrammar().add(ReportsG);
-	
-	//Tabajamos los Informes
-	
-HashMap<String, CompleteElementType> ReportsElem= new HashMap<String, CompleteElementType>();
-	
-
-CompleteTextElementType CODE=new CompleteTextElementType("CODE",ReportsG);
-ReportsG.getSons().add(CODE);
-
-TerrminosElem.put("CODE", CODE);
-
-	CompleteTextElementType Description=new CompleteTextElementType("Description",ReportsG);
-	ReportsG.getSons().add(Description);
-	
-	ReportsElem.put("Description", Description);
-	
-	
-	CompleteResourceElementType Images=new CompleteResourceElementType("Images",ReportsG);
-	ReportsG.getSons().add(Images);
-	Images.setMultivalued(true);
-	
-	ReportsElem.put("Images", Images);
-	
-	List<CompleteResourceElementType> ImagenesList=new ArrayList<>();
-	ImagenesList.add(Images);
-	
-	
-	TablaElem.put(ReportsG, ReportsElem);
-	
-	
-	
-	String DocIcon="https://www.freeiconspng.com/uploads/document-icon-10.jpg";
-	
-	for (int i = 0; i < documentosList.size(); i++) {
-	String Iden = documentosList.get(i);
-		HashMap<String, List<HashMap<String, HashSet<String>>>> Table = supertabla.get(Iden);
-		CompleteDocuments Doc=new CompleteDocuments(C,documentosListText.get(i) , DocIcon);
-		C.getEstructuras().add(Doc);
-		
-		CompleteTextElement IDEN=new CompleteTextElement(CODE, Iden);
-		Doc.getDescription().add(IDEN);
-		
-		CompleteTextElement DESC=new CompleteTextElement(Description, documentosListText.get(i) );
-		Doc.getDescription().add(DESC);
-		
-		if (Table!=null)
-		
-		for (Entry<String, List<HashMap<String, HashSet<String>>>> semantica_word_doc : Table.entrySet()) {
-			//TODO Es el 1 o el 2?
-			for (Entry<String, HashSet<String>> completeLinkElementType : semantica_word_doc.getValue().get(0).entrySet()) {
-					CompleteDocuments WordS=supertablaSemPos_Doc.get(semantica_word_doc.getKey()).get(completeLinkElementType.getKey());
-					Integer Informes_Doc = actualInforme.get(WordS);
-					
-					if (Informes_Doc==null)
-						System.out.println("AA");
-					
-					while (RepordList.size()<=Informes_Doc)
-					{
+						CompleteDocuments WordInstance=term_Sem.get(cEntryTerm);
 						
-					CompleteLinkElementType ReportsI=new CompleteLinkElementType("Reports",Terminos);
-					Terminos.getSons().add(ReportsI);
-					ReportsI.setMultivalued(true);
-					ReportsI.setClassOfIterator(Reports);
-					RepordList.add(ReportsI);
-					
+						if (WordInstance==null)
+							{
+							
+								String ocurrenceValue="";
+								
+								if (j==0)
+									ocurrenceValue="(+)";
+								else
+									ocurrenceValue="(-)";
+									
+								WordInstance=new CompleteDocuments(C, cEntryTerm + " "+ocurrenceValue, iconEntry);
+								C.getEstructuras().add(WordInstance);
+								term_Sem.put(cEntryTerm, WordInstance);
+								
+								CompleteTextElement ocurrence_value=new CompleteTextElement(occurrence, ocurrenceValue );
+								WordInstance.getDescription().add(ocurrence_value);
+								
+								CompleteTextElement categoria_value=new CompleteTextElement(Categoria, categoria );
+								WordInstance.getDescription().add(categoria_value);
+								
+							}
+						
+						if (j==0)
+							supertablaSemPos_Doc.put(categoria,term_Sem);
+						else
+							supertablaSemNeg_Doc.put(categoria,term_Sem);
+						//TPDP
+						
+						Integer actualDocsAsoc=entry_docum_cnt.get(WordInstance);
+						
+						if (actualDocsAsoc==null)
+							actualDocsAsoc=new Integer(-1);
+						
+						actualDocsAsoc=new Integer(actualDocsAsoc.intValue()+1);
+						
+						entry_docum_cnt.put(WordInstance, actualDocsAsoc);
+						
+						if (reportList.size()<=actualDocsAsoc)
+						{
+							CompleteTextElementType report_new=new CompleteTextElementType("Report*",Terminos);
+							Terminos.getSons().add(report_new);
+							report_new.setMultivalued(true);
+							report_new.setClassOfIterator(report);
+							reportList.add(report_new);
+							
+							CompleteTextElementType Words_new=new CompleteTextElementType("Words",report_new,Terminos);
+							report_new.getSons().add(Words_new);
+							
+							CompleteLinkElementType report_Link_new=new CompleteLinkElementType("Report Link",report_new,Terminos);
+							report_new.getSons().add(report_Link_new);
+							
+						}
+						
+						CompleteTextElementType reportAc=reportList.get(actualDocsAsoc);
+						
+						
+						CompleteTextElement wordsa=new CompleteTextElement((CompleteTextElementType)reportAc.getSons().get(0),
+								Arrays.toString(completeLinkElementType.getValue().toArray()) );
+						WordInstance.getDescription().add(wordsa);
+						
+						CompleteLinkElement linksRef=new CompleteLinkElement((CompleteLinkElementType)reportAc.getSons().get(1),Doc );
+						WordInstance.getDescription().add(linksRef);
+						
+						Integer actualEntryAsoc=docum_entry_cnt.get(Doc);
+						
+						if (actualEntryAsoc==null)
+							actualEntryAsoc=new Integer(-1);
+						
+						actualEntryAsoc=new Integer(actualEntryAsoc.intValue()+1);
+						
+						docum_entry_cnt.put(Doc, actualDocsAsoc);
+						
+						if (cEntryList.size()<=actualEntryAsoc)
+						{
+							CompleteLinkElementType cEntry_new=new CompleteLinkElementType("CEntry*",Terminos);
+							cEntry_new.setMultivalued(true);
+							cEntry_new.setClassOfIterator(cEntry);
+							cEntryList.add(cEntry_new);
+						}
+						
+						
 					}
-					
-					CompleteLinkElement CLE=new CompleteLinkElement(RepordList.get(Informes_Doc), Doc);
-					WordS.getDescription().add(CLE);
-					
-					actualInforme.put(WordS, new Integer(Informes_Doc.intValue()+1));
-					
+				}
+				
 			}
 		}
-		
 		
 		
 		HashSet<String> imagenesLinks = new HashSet<String>(imagenes_Tabla.get(Iden)) ;
@@ -414,7 +352,7 @@ TerrminosElem.put("CODE", CODE);
 				CompleteResourceElementType ImagesI=new CompleteResourceElementType("Images",ReportsG);
 				ReportsG.getSons().add(ImagesI);
 				ImagesI.setMultivalued(true);
-				ImagesI.setClassOfIterator(Images);
+				ImagesI.setClassOfIterator(image);
 				ImagenesList.add(ImagesI);
 			}
 			
@@ -427,12 +365,24 @@ TerrminosElem.put("CODE", CODE);
 			
 			
 			}
-			
 		
 		
-		//AQUI QUEdan las imagenes
 	}
 	
+	for (CompleteLinkElementType cEntryele : cEntryList) {
+		ReportsG.getSons().add(cEntryele);
+	}
+	
+	for (CompleteResourceElementType imageele : ImagenesList) {
+		ReportsG.getSons().add(imageele);
+	}
+	
+	
+	
+	
+	
+	
+		
 	return Salida;
 }
 
