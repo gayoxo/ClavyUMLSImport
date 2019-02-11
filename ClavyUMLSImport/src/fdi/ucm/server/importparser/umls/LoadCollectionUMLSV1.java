@@ -6,7 +6,6 @@ package fdi.ucm.server.importparser.umls;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -110,6 +109,7 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	Salida.setCollection(C);
 		
 	HashMap<CompleteGrammar,HashMap<String, CompleteElementType>> TablaElem=new HashMap<>();
+	HashMap<CompleteTextElementType, List<CompleteTextElementType>> Report_Words = new HashMap<>();
 	
 	//Catalogue Entry
 	
@@ -141,7 +141,13 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	TerrminosElem.put("Report*", report);
 	
 	CompleteTextElementType Words=new CompleteTextElementType("Words",report,Terminos);
-	report.getSons().add(Words);
+	//report.getSons().add(Words);
+	Words.setMultivalued(true);
+	
+	LinkedList<CompleteTextElementType> Words_rep=new LinkedList<>();
+	Words_rep.add(Words);
+	
+	Report_Words.put(report, Words_rep);
 	
 	TerrminosElem.put("Words", Words);
 	
@@ -174,10 +180,10 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	ReportsElem.put("CEntry*", cEntry);
 	
 	
-	CompleteResourceElementType image=new CompleteResourceElementType("Images",ReportsG);
+	CompleteResourceElementType image=new CompleteResourceElementType("Images*",ReportsG);
 	image.setMultivalued(true);
 	
-	ReportsElem.put("Images", image);
+	ReportsElem.put("Images*", image);
 	
 	List<CompleteResourceElementType> ImagenesList=new ArrayList<>();
 	ImagenesList.add(image);
@@ -198,6 +204,7 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	
 	HashMap<CompleteDocuments, Integer> entry_docum_cnt = new HashMap<>();
 	HashMap<CompleteDocuments, Integer> docum_entry_cnt = new HashMap<>();
+	
 	
 	for (int i = 0; i < documentosList.size(); i++) {
 	String Iden = documentosList.get(i);
@@ -265,6 +272,9 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 								C.getEstructuras().add(WordInstance);
 								term_Sem.put(cEntryTerm, WordInstance);
 								
+								CompleteTextElement clinical_Term_value=new CompleteTextElement(clinical_Term, cEntryTerm );
+								WordInstance.getDescription().add(clinical_Term_value);
+								
 								CompleteTextElement ocurrence_value=new CompleteTextElement(occurrence, ocurrenceValue );
 								WordInstance.getDescription().add(ocurrence_value);
 								
@@ -297,21 +307,49 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 							reportList.add(report_new);
 							
 							CompleteTextElementType Words_new=new CompleteTextElementType("Words",report_new,Terminos);
-							report_new.getSons().add(Words_new);
+//							report_new.getSons().add(Words_new);
+							Words_new.setClassOfIterator(Words);
+							Words_new.setMultivalued(true);
+
+							LinkedList<CompleteTextElementType> Words_rep2=new LinkedList<>();
+							Words_rep2.add(Words_new);
+							
+							Report_Words.put(report_new, Words_rep2);
 							
 							CompleteLinkElementType report_Link_new=new CompleteLinkElementType("Report Link",report_new,Terminos);
 							report_new.getSons().add(report_Link_new);
+							report_Link_new.setClassOfIterator(report_Link);
 							
 						}
 						
 						CompleteTextElementType reportAc=reportList.get(actualDocsAsoc);
 						
+						List<CompleteTextElementType> lista_wordT = Report_Words.get(reportAc);
 						
-						CompleteTextElement wordsa=new CompleteTextElement((CompleteTextElementType)reportAc.getSons().get(0),
-								Arrays.toString(completeLinkElementType.getValue().toArray()) );
-						WordInstance.getDescription().add(wordsa);
+						HashSet<String> ListWords_value = completeLinkElementType.getValue();
 						
-						CompleteLinkElement linksRef=new CompleteLinkElement((CompleteLinkElementType)reportAc.getSons().get(1),Doc );
+						if (lista_wordT.size()<=ListWords_value.size())
+						{
+							CompleteTextElementType Words_new=new CompleteTextElementType("Words",reportAc,Terminos);
+//							report_new.getSons().add(Words_new);
+							Words_new.setClassOfIterator(Words);
+							Words_new.setMultivalued(true);
+							lista_wordT.add(Words_new);
+						}
+						
+						Report_Words.put(reportAc, lista_wordT);
+
+						int l = 0;
+						for (String string : ListWords_value) {
+							CompleteTextElement wordsa=new CompleteTextElement(lista_wordT.get(l),
+									string);
+							l++;
+							WordInstance.getDescription().add(wordsa);
+						}
+						
+						
+						
+						CompleteLinkElement linksRef=new CompleteLinkElement((CompleteLinkElementType)reportAc.getSons().get(0),Doc );
 						WordInstance.getDescription().add(linksRef);
 						
 						Integer actualEntryAsoc=docum_entry_cnt.get(Doc);
@@ -321,7 +359,7 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 						
 						actualEntryAsoc=new Integer(actualEntryAsoc.intValue()+1);
 						
-						docum_entry_cnt.put(Doc, actualDocsAsoc);
+						docum_entry_cnt.put(Doc, actualEntryAsoc);
 						
 						if (cEntryList.size()<=actualEntryAsoc)
 						{
@@ -330,6 +368,11 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 							cEntry_new.setClassOfIterator(cEntry);
 							cEntryList.add(cEntry_new);
 						}
+						
+						CompleteLinkElementType cEntryListElem=cEntryList.get(actualEntryAsoc);
+						
+						CompleteLinkElement linksCentry=new CompleteLinkElement(cEntryListElem,WordInstance );
+						Doc.getDescription().add(linksCentry);
 						
 						
 					}
@@ -349,8 +392,7 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 			while (ImagenesList.size()<imagenesLinksList.size())
 			{
 		
-				CompleteResourceElementType ImagesI=new CompleteResourceElementType("Images",ReportsG);
-				ReportsG.getSons().add(ImagesI);
+				CompleteResourceElementType ImagesI=new CompleteResourceElementType("Images*",ReportsG);
 				ImagesI.setMultivalued(true);
 				ImagesI.setClassOfIterator(image);
 				ImagenesList.add(ImagesI);
@@ -378,7 +420,13 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 	}
 	
 	
-	
+	for (Entry<CompleteTextElementType, List<CompleteTextElementType>> report_listW : Report_Words.entrySet()) {
+		
+		for (CompleteTextElementType worsd_for_report : report_listW.getValue()) {
+			report_listW.getKey().getSons().add(worsd_for_report);
+		}
+		
+	}
 	
 	
 	
