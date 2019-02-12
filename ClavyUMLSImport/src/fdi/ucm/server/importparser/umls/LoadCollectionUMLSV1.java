@@ -381,11 +381,12 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 			}
 		}
 		
+		if (imagenes_Tabla.get(Iden) != null)
+		{
 		
 		HashSet<String> imagenesLinks = new HashSet<String>(imagenes_Tabla.get(Iden)) ;
 		
-		if (imagenesLinks != null)
-			{
+		
 			
 			LinkedList<String> imagenesLinksList = new LinkedList<String>(imagenesLinks);
 			
