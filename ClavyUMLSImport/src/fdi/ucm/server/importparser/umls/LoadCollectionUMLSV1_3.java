@@ -47,6 +47,7 @@ public class LoadCollectionUMLSV1_3 extends LoadCollectionUMLSV1{
 		AA.add(Carpeta+"salida.xml");
 		AA.add(Carpeta+"terminos_filtrados.txt");
 		AA.add(Carpeta+"openi_nlm_nih_gov.json");
+		AA.add(Carpeta+"reducido.csv");
 	
 			 Salida=LC.processCollecccion(AA);
 	

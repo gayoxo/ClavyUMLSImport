@@ -120,6 +120,8 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 		String Sample_File = dateEntrada.get(1);
 		String Salida_File = dateEntrada.get(2);
 		String Terminos_Filtrados_File = dateEntrada.get(3);
+		String Imagenes_File = dateEntrada.get(4);
+		String Reducido = dateEntrada.get(5);
 		
 		CompleteCollectionAndLog Salida= new CompleteCollectionAndLog();
 		Salida.setLogLines(new ArrayList<String>());
@@ -169,7 +171,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 		
 		System.out.println("//Procesando las imagenes");
 		try {
-			imagenes_Tabla= processImagenes();
+			imagenes_Tabla= processImagenes(Imagenes_File);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Salida.getLogLines().add("El archivo de procesado de imagenes no esta, me lo intento descargar");
@@ -181,7 +183,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 		try {
 			procesaSalida(Salida_File,Terminos_Filtrados_File,
 					DocumentosList,DocumentosListText,Supertabla,
-					SupertablaSemPos,SupertablaSemNeg,TablaSemanticaTexto,Salida);
+					SupertablaSemPos,SupertablaSemNeg,TablaSemanticaTexto,Salida,Reducido);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Salida.getLogLines().add("Error en la lectura del archivo de salida xml");
@@ -427,7 +429,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 			HashMap<String, HashMap<String, List<HashMap<String, HashSet<String>>>>> Supertabla,
 			HashMap<String, HashMap<String, HashSet<String>>> SupertablaSemPos,
 			HashMap<String, HashMap<String, HashSet<String>>> SupertablaSemNeg, HashMap<String,
-			String> TablaSemanticaTexto, CompleteCollectionAndLog salida) {
+			String> TablaSemanticaTexto, CompleteCollectionAndLog salida, String reducido) {
 		
 		
 		
@@ -441,7 +443,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 		try {
 			
 			
-			String csvFile = "Reducido.csv";
+			String csvFile = reducido;
 	        String line = "";
 	        String cvsSplitBy = ";";
 
@@ -743,7 +745,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 	
 	
 
-	private static HashMap<String, HashSet<String>> processImagenes() {
+	private static HashMap<String, HashSet<String>> processImagenes(String imagenes_File) {
 
 
 		   
@@ -751,7 +753,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 		
 		   JsonReader reader;
 		try {
-			reader = new JsonReader(new FileReader( "openi_nlm_nih_gov.json"));
+			reader = new JsonReader(new FileReader( imagenes_File));
 			Gson gson = new Gson();
 			HashMap<String, HashSet<String>> Imagenes_List =  gson.fromJson(reader, HashMap.class);
 			
@@ -780,6 +782,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 			//Futuro
 			//ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories cvs",true));
 			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Openi json File"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Resume Category csv"));
 			Parametros=ListaCampos;
 			return ListaCampos;
 		}
