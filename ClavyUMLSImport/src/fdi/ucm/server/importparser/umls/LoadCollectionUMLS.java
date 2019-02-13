@@ -820,14 +820,11 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 		{
 			ArrayList<ImportExportPair> ListaCampos=new ArrayList<ImportExportPair>();
 			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents json File"));
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents String txt File"));
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "UMLS output File"));
-			//ESTO ES MEJORABLE
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories txt",true));
-			//Futuro
-			//ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories cvs",true));
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Openi json File"));
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Resume Category csv"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "List Documents findings strings txt File"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "UMLS output xml File"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Filter categories (txt or json) File",true));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Openi images equivalence json File"));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.File, "Short to complete semantic category names equivalence cvs File "));
 			Parametros=ListaCampos;
 			return ListaCampos;
 		}
