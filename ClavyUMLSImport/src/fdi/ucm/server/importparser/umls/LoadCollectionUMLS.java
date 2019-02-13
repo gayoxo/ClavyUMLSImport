@@ -26,6 +26,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.stream.JsonReader;
 
 import fdi.ucm.server.modelComplete.ImportExportDataEnum;
@@ -39,6 +40,10 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
  */
 public abstract class LoadCollectionUMLS extends LoadCollection{
 
+
+	
+	
+	
 	
 	private static ArrayList<ImportExportPair> Parametros;
 	public static boolean consoleDebug=false;
@@ -466,8 +471,8 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 			
 			
 			
-			
-			
+			if (terminos_Filtrados_File.endsWith(".txt"))
+			{	
 			String csvFile2 = terminos_Filtrados_File;
 	        String line2 = "";
 
@@ -505,7 +510,47 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 	            TablaSemanticaTextoValidas=new HashMap<>();
 	        }
 	        
-	        
+			}else 	if (terminos_Filtrados_File.endsWith(".json"))
+			{	
+				
+
+				   JsonReader reader;
+				try {
+					reader = new JsonReader(new FileReader( terminos_Filtrados_File));
+					Gson gson = new Gson();
+					@SuppressWarnings("rawtypes")
+					List<LinkedTreeMap> semantica =  gson.fromJson(reader, List.class);
+					
+					TablaSemanticaTextoValidas=new HashMap<>();
+					
+					for (@SuppressWarnings("rawtypes") LinkedTreeMap semantica2 : semantica) 
+						{
+						try {
+							String name=(String)semantica2.get("sname");
+							@SuppressWarnings("unchecked")
+							LinkedList<String> valores=new LinkedList<>((List<String>)semantica2.get("terms"));
+							TablaSemanticaTextoValidas.put(name,valores);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					
+						}
+					
+					
+
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+					 salida.getLogLines().add("Sin archivo de filtrado");
+			            TablaSemanticaTextoValidas=new HashMap<>();
+				}
+				
+				
+			}else
+				{
+				 salida.getLogLines().add("Sin archivo de filtrado");
+		           TablaSemanticaTextoValidas=new HashMap<>();
+				}
+				
 	        
 	       
 	        
