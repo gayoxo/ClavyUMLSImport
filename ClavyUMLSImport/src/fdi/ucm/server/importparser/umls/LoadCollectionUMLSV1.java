@@ -441,7 +441,7 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 
 	@Override
 	public String getName() {
-		return "UMLS XML Import V1";
+		return "UMLS Import V1";
 	}
 
 

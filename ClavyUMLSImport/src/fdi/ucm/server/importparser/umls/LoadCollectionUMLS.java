@@ -833,7 +833,7 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 
 	@Override
 	public String getName() {
-		return "UMLS XML Import";
+		return "UMLS Import";
 	}
 
 	@Override
