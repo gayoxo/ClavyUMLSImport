@@ -175,6 +175,7 @@ public class LoadCollectionUMLS_SemCatV1 extends LoadCollectionUMLS_SemCat{
 		
 		
 		for (Entry<CompleteElementType, List<CompleteElementType>> eReltype : act_listMultiAct.entrySet()) {
+			//TODO MEter aqui las categorias
 			SemanticaG.getSons().add(eReltype.getKey());
 			for (CompleteElementType hermanodeeReltype : eReltype.getValue()) 
 				if (hermanodeeReltype!=eReltype)
