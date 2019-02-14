@@ -279,7 +279,7 @@ public class LoadCollectionUMLSV1 extends LoadCollectionUMLS{
 								CompleteTextElement ocurrence_value=new CompleteTextElement(occurrence, ocurrenceValue );
 								WordInstance.getDescription().add(ocurrence_value);
 								
-								CompleteTextElement categoria_value=new CompleteTextElement(Categoria, categoria );
+								CompleteTextElement categoria_value=new CompleteTextElement(Categoria, TablaSemanticaTexto.get(categoria) );
 								WordInstance.getDescription().add(categoria_value);
 								
 							}
