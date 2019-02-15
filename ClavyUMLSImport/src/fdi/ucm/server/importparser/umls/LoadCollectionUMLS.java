@@ -486,6 +486,8 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 	            		{
 	            		SemanticaA=line2.replace("Semantica=>", "");
 	            		SemanticaA=TablaSemanticaTextoInversa.get(SemanticaA);
+	            		 List<String> Valores= new LinkedList<>();
+	            		TablaSemanticaTextoValidas.put(SemanticaA, Valores);
 	            		}
 			    	 else
 				    	 {
@@ -663,16 +665,23 @@ public abstract class LoadCollectionUMLS extends LoadCollection{
 								
 								HashSet<String> ValidCandidate=new HashSet<>();
 								
-								
+								if (!TablaSemanticaTextoValidas.keySet().isEmpty())
+								{
 								for (String string : SemTypes) {
+									
+									
 									List<String> ListaWordVal = TablaSemanticaTextoValidas.get(string);
 									
-									
-									if(ListaWordVal.contains(CandidatePreferred))
+									if (ListaWordVal==null||ListaWordVal.isEmpty())
 										ValidCandidate.add(string);
+									else
+										if(ListaWordVal.contains(CandidatePreferred))
+											ValidCandidate.add(string);
 									
 
 								}
+								}else
+									ValidCandidate.addAll(SemTypes);
 								
 								
 								if (!SemTypes.isEmpty()&&!MatchedWords.isEmpty()&&!ValidCandidate.isEmpty())
