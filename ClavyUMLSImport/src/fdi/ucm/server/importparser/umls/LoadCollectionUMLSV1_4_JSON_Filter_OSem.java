@@ -12,15 +12,15 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
  * @author Joaquin Gayoso Cabada
  *
  */
-public class LoadCollectionUMLSV1_4_JSON_Filter_OSem extends LoadCollectionUMLSV1{
+public class LoadCollectionUMLSV1_4_JSON_Filter_OSem extends LoadCollectionUMLSV1_0{
 
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LoadCollectionUMLS LC=new LoadCollectionUMLSV1_4_JSON_Filter_OSem();
-		LoadCollectionUMLS.consoleDebug=true;
+		LoadCollectionUMLSV1 LC=new LoadCollectionUMLSV1_4_JSON_Filter_OSem();
+		LoadCollectionUMLSV1.consoleDebug=true;
 		
 		ArrayList<String> AA=new ArrayList<String>();
 		

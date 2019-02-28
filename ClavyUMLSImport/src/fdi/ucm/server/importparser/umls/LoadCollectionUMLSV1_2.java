@@ -13,15 +13,15 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
  * @author Joaquin Gayoso Cabada
  *
  */
-public class LoadCollectionUMLSV1_2 extends LoadCollectionUMLSV1{
+public class LoadCollectionUMLSV1_2 extends LoadCollectionUMLSV1_0{
 
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LoadCollectionUMLS LC=new LoadCollectionUMLSV1_2();
-		LoadCollectionUMLS.consoleDebug=true;
+		LoadCollectionUMLSV1 LC=new LoadCollectionUMLSV1_2();
+		LoadCollectionUMLSV1.consoleDebug=true;
 		
 		ArrayList<String> AA=new ArrayList<String>();
 		
