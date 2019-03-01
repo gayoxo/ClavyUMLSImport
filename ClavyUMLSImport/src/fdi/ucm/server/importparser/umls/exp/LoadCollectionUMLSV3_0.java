@@ -228,7 +228,7 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		docUttList.add(doc_lin2);
 	}
 	
-	//FALTA LA PARTE DE LOS DOCUMENTOS QUE ES IGUAL QUE LO DE ARRUIBA
+	//FALTA LA PARTE DE LOS DOCUMENTOS QUE ES IGUAL QUE LO DE ARRIBA
 	
 	//Tabajamos los Informes
 	
