@@ -198,20 +198,35 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	
 	
 	List<CompleteLinkElementType> termUttList=new LinkedList<>();
-	CompleteLinkElementType term_lin=new CompleteLinkElementType("Term*",Terminos);
+	CompleteLinkElementType term_lin=new CompleteLinkElementType("Entry*",Terminos);
 	Uterancia.getSons().add(term_lin);
 	term_lin.setMultivalued(true);
-	TerrminosElem.put("Term*", term_lin);
+	UtteElem.put("Entry*", term_lin);
 	termUttList.add(term_lin);
 	
 	for (int i = 1; i < numero_terminos; i++) {
-		CompleteLinkElementType term_lin2=new CompleteLinkElementType("Term*",Terminos);
+		CompleteLinkElementType term_lin2=new CompleteLinkElementType("Entry*",Terminos);
 		Uterancia.getSons().add(term_lin2);
 		term_lin2.setMultivalued(true);
 		term_lin2.setClassOfIterator(term_lin);
 		termUttList.add(term_lin2);
 	}
 	
+	
+	List<CompleteLinkElementType> docUttList=new LinkedList<>();
+	CompleteLinkElementType doc_lin=new CompleteLinkElementType("Report*",Terminos);
+	Uterancia.getSons().add(doc_lin);
+	doc_lin.setMultivalued(true);
+	UtteElem.put("Report*", doc_lin);
+	docUttList.add(doc_lin);
+	
+	for (int i = 1; i < numero_terminos; i++) {
+		CompleteLinkElementType doc_lin2=new CompleteLinkElementType("Report*",Terminos);
+		Uterancia.getSons().add(doc_lin2);
+		doc_lin2.setMultivalued(true);
+		doc_lin2.setClassOfIterator(doc_lin);
+		docUttList.add(doc_lin2);
+	}
 	
 	//FALTA LA PARTE DE LOS DOCUMENTOS QUE ES IGUAL QUE LO DE ARRUIBA
 	
