@@ -295,7 +295,7 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		C.getEstructuras().add(Doc);
 		iden_docum.put(Iden, Doc);
 		
-		CompleteTextElement DESC=new CompleteTextElement(Description, documentosListText.get(i) );
+		CompleteTextElement DESC=new CompleteTextElement(Description, documentosListText.get(Iden) );
 		Doc.getDescription().add(DESC);
 		
 		
