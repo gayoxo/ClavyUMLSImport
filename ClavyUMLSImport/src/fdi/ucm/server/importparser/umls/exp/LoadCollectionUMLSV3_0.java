@@ -166,6 +166,15 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	List<CompleteTextElementType> reportList=new ArrayList<>();
 	reportList.add(report);
 	
+	
+	CompleteLinkElementType utterance_Link=new CompleteLinkElementType("Uterances*",Terminos);
+	utterance_Link.setMultivalued(true);
+	
+	TerrminosElem.put("Uterances*", utterance_Link);
+	
+	List<CompleteLinkElementType> utterance_Link_List=new ArrayList<>();
+	utterance_Link_List.add(utterance_Link);
+	
 	TablaElem.put(Terminos,TerrminosElem);
 	
 	//TABAJAMOS en utterancias
@@ -245,6 +254,8 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		docUttList.add(doc_lin2);
 	}
 	
+	TablaElem.put(Uterancia, UtteElem);
+	
 	//FALTA LA PARTE DE LOS DOCUMENTOS QUE ES IGUAL QUE LO DE ARRIBA
 	
 	//Tabajamos los Informes
@@ -260,15 +271,22 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	
 	ReportsElem.put("Description", Description);
 	
-	CompleteLinkElementType cEntry=new CompleteLinkElementType("CEntry*",Terminos);
+	CompleteLinkElementType cEntry=new CompleteLinkElementType("CEntry*",ReportsG);
 	cEntry.setMultivalued(true);
 	ReportsElem.put("CEntry*", cEntry);
 	
 	
 	CompleteResourceElementType image=new CompleteResourceElementType("Images*",ReportsG);
-	image.setMultivalued(true);
-	
+	image.setMultivalued(true);	
 	ReportsElem.put("Images*", image);
+	
+	
+	CompleteLinkElementType Uterancia_ele=new CompleteLinkElementType("Uterances*",ReportsG);
+	Uterancia_ele.setMultivalued(true);
+	ReportsElem.put("Uterances*", Uterancia_ele);
+	
+	List<CompleteLinkElementType> Uterancia_docs_List=new ArrayList<>();
+	Uterancia_docs_List.add(Uterancia_ele);
 	
 	List<CompleteResourceElementType> ImagenesList=new ArrayList<>();
 	ImagenesList.add(image);
@@ -558,10 +576,15 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		
 	}
 	
+	
+	HashMap<String, CompleteDocuments> utte_docum_equi=new HashMap<>();
+	
 	String iconUtter="https://www.freeiconspng.com/uploads/maps-center-direction-icon-24.png"; 
 	for (String utteruni : total) {
 		CompleteDocuments uteruno=new CompleteDocuments(C, utteruni, iconUtter);
 		C.getEstructuras().add(uteruno);
+		
+		utte_docum_equi.put(utteruni, uteruno);
 		
 		CompleteTextElement nameElem=new CompleteTextElement(NombreUtte, utteruni );
 		uteruno.getDescription().add(nameElem);
@@ -595,10 +618,107 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		
 	}
 	
+	HashMap<CompleteDocuments, HashSet<CompleteDocuments>> utte_doc_inv=new HashMap<>();
+	for (Entry<String, HashSet<CompleteDocuments>> ute_doc_uni : utte_doc.entrySet()) {
+		for (CompleteDocuments doc_uni : ute_doc_uni.getValue()) {
+			
+			HashSet<CompleteDocuments> utters=utte_doc_inv.get(doc_uni);
+			if (utters==null)
+				utters=new HashSet<>();
+			CompleteDocuments utedoc = utte_docum_equi.get(ute_doc_uni.getKey());
+			if (utedoc!=null)
+				utters.add(utedoc);
+			else
+				{
+				System.err.println("uterancia " +ute_doc_uni.getKey()+" no encontrado");
+				Salida.getLogLines().add("uterancia " +ute_doc_uni.getKey()+" no encontrado");
+				}
+			utte_doc_inv.put(doc_uni, utters);
+		}
+	}
+	
+	HashMap<CompleteDocuments, HashSet<CompleteDocuments>> utte_entry_inv=new HashMap<>();
+	for (Entry<String, HashSet<CompleteDocuments>> ute_entry_uni : utte_entry.entrySet()) {
+		for (CompleteDocuments entry_uni : ute_entry_uni.getValue()) {
+			HashSet<CompleteDocuments> utters=utte_entry_inv.get(entry_uni);
+			if (utters==null)
+				utters=new HashSet<>();
+			CompleteDocuments utedoc = utte_docum_equi.get(ute_entry_uni.getKey());
+			if (utedoc!=null)
+				utters.add(utedoc);
+			else
+				{
+				System.err.println("uterancia " +ute_entry_uni.getKey()+" no encontrado");
+				Salida.getLogLines().add("uterancia " +ute_entry_uni.getKey()+" no encontrado");
+				}
+			utte_entry_inv.put(entry_uni, utters);
+		}
+	}
+	
+	int max_uterances_doc=1;
+	for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> doc_utte : utte_doc_inv.entrySet())
+		if (doc_utte.getValue().size()>max_uterances_doc)
+			max_uterances_doc=doc_utte.getValue().size();
+	
+	int max_uterances_entry=1;
+	for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> term_utte : utte_entry_inv.entrySet())
+		if (term_utte.getValue().size()>max_uterances_entry)
+			max_uterances_entry=term_utte.getValue().size();
+	
+	
+	//TODO FALTA LA DE LOS DOCUMENTOS
+	
+	for (int i = 1; i < max_uterances_entry; i++) {
+		CompleteLinkElementType utterance_Link_multi=new CompleteLinkElementType("Uterances*",Terminos);
+		utterance_Link_multi.setMultivalued(true);
+		TerrminosElem.put("Uterances*", utterance_Link_multi);
+		utterance_Link_multi.setClassOfIterator(utterance_Link);
+		utterance_Link_List.add(utterance_Link_multi);
+	}
+	
+	for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> entry_utte : utte_entry_inv.entrySet())
+	{
+		List<CompleteDocuments> lista_docs=new LinkedList<>(entry_utte.getValue());
+		for (int i = 0; i < lista_docs.size(); i++) {
+			CompleteLinkElement linksRef=new CompleteLinkElement(utterance_Link_List.get(i),lista_docs.get(i));
+			entry_utte.getKey().getDescription().add(linksRef);
+		}
+	}
+	
+	for (int i = 1; i < max_uterances_doc; i++) {
+		CompleteLinkElementType Uterancia_ele_multi=new CompleteLinkElementType("Uterances*",ReportsG);
+		Uterancia_ele_multi.setMultivalued(true);
+		TerrminosElem.put("Uterances*", Uterancia_ele_multi);
+		Uterancia_ele_multi.setClassOfIterator(Uterancia_ele);
+		Uterancia_docs_List.add(Uterancia_ele_multi);
+	}
+	
+	for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> doc_utte : utte_doc_inv.entrySet())
+	{
+		List<CompleteDocuments> lista_docs=new LinkedList<>(doc_utte.getValue());
+		for (int i = 0; i < lista_docs.size(); i++) {
+			CompleteLinkElement linksRef=new CompleteLinkElement(Uterancia_docs_List.get(i),lista_docs.get(i));
+			doc_utte.getKey().getDescription().add(linksRef);
+		}
+	}
+	
+	
+	//DAle caña
+//	CompleteLinkElementType utterance_Link=new CompleteLinkElementType("Uterances*",Terminos);
+//	Terminos.getSons().add(utterance_Link);
+//	
+//	TerrminosElem.put("Uterances*", utterance_Link);
+//	
+//	List<CompleteLinkElementType> utterance_Link_List=new ArrayList<>();
+//	utterance_Link_List.add(utterance_Link);
 	
 	
 	for (CompleteTextElementType report_new : reportList) {
 		Terminos.getSons().add(report_new);
+	}
+	
+	for (CompleteLinkElementType uterance_link : utterance_Link_List) {
+		Terminos.getSons().add(uterance_link);
 	}
 	
 	
@@ -610,6 +730,9 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		ReportsG.getSons().add(imageele);
 	}
 	
+	for (CompleteLinkElementType uterance_link : Uterancia_docs_List) {
+		ReportsG.getSons().add(uterance_link);
+	}
 	
 	for (Entry<CompleteTextElementType, List<CompleteTextElementType>> report_listW : Report_Words.entrySet()) {
 		
