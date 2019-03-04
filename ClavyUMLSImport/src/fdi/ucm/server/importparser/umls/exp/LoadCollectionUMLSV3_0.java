@@ -3,6 +3,7 @@
  */
 package fdi.ucm.server.importparser.umls.exp;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -43,11 +44,19 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		
 
 	
-		AA.add("sample.txt");
-		AA.add("salida.xml");
-		AA.add("terminos_filtrados.txt");
+		String Carpeta="dos";
+		if (args.length>0)
+			Carpeta=args[0];
+		if (!Carpeta.isEmpty()&&!Carpeta.endsWith(File.separator))	
+			Carpeta=Carpeta+File.separator;
+			
+	
+		AA.add("dos/sample.txt");
+		AA.add("dos/salida.xml");
+		AA.add("dos/terminos_filtrados.txt");
 		AA.add("openi_nlm_nih_gov.json");
 		AA.add("reducido.csv");
+	
 	
 			 Salida=LC.processCollecccion(AA);
 	
@@ -63,7 +72,7 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 
 			
 			try {
-				String FileIO = System.getProperty("user.home")+"/"+System.currentTimeMillis()+".clavy";
+				String FileIO = System.currentTimeMillis()+".clavy";
 				
 				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FileIO));
 

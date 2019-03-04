@@ -1,0 +1,9 @@
+Semantica=>Finding
+Semantica=>Sign or Symptom
+Semantica=>Injury or Poisoning
+Semantica=>Pathologic Function
+Semantica=>Disease or Syndrome
+Semantica=>Neoplastic Process
+Semantica=>Anatomical Abnormality
+Semantica=>Acquired Abnormality
+Semantica=>Congenital Abnormality

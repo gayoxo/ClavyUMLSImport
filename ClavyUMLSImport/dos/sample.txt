@@ -1,0 +1,10 @@
+CXR1010|Cardiac and mediastinal contours are within normal limits. The lungs are clear. Bony structures are intact.
+CXR1263|Cardiac and mediastinal contours are within normal limits. The lungs are clear. Bony structures are intact.
+CXR1367|The heart size is normal. Lungs are clear. There is no pleural line to suggest pneumothorax or costophrenic XXXX blunting to suggest large pleural effusion. Bony structures are within normal limits.
+CXR1544|Normal heart. Clear lungs. No pneumothorax. No pleural effusion.
+CXR1674|The previously seen right-sided PICC has been removed. The heart size is normal. Lungs are clear. There is no pneumothorax or large pleural effusion. Bony structures are within normal limits.
+CXR1804|Heart size, mediastinal contour, and pulmonary vascularity are within normal limits. There is a right chest XXXX with central venous catheter tip overlying the high SVC. No focal consolidation, suspicious pulmonary opacity, large pleural effusion, or pneumothorax is identified. Visualized osseous structures appear intact.
+CXR2047|Large calcified granuloma in the right lower lobe is unchanged. No pneumothorax. Heart size is normal. No large pleural effusions. No focal airspace opacification.
+CXR226|The cardiac contours are normal. The lungs are clear. Thoracic spondylosis.
+CXR334|Heart size is normal. Left midlung small calcified granulomas unchanged. Persistent partial middle lobe atelectasis and infiltrate seen XXXX on the lateral
+CXR88|Heart is mildly heart enlarged. Mediastinal contour normal. There is mild diffuse interstitial prominence suggestive of edema. No focal airspace consolidation or pleural effusion. Degenerative changes of the the spine.
