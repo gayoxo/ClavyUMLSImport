@@ -72,7 +72,11 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 
 			
 			try {
-				String FileIO = System.currentTimeMillis()+".clavy";
+				String nombre=System.currentTimeMillis()+".clavy";
+				
+				System.out.println(nombre);
+				
+				String FileIO = nombre;
 				
 				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FileIO));
 
@@ -497,8 +501,8 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	
 	//UTERANCIAS Y TERMINOS
 	
-	HashMap<String, List<CompleteDocuments>> utte_doc=new HashMap<>();
-	HashMap<String, List<CompleteDocuments>> utte_entry=new HashMap<>();
+	HashMap<String, HashSet<CompleteDocuments>> utte_doc=new HashMap<>();
+	HashMap<String, HashSet<CompleteDocuments>> utte_entry=new HashMap<>();
 	HashSet<String> total=new HashSet<>();
 	
 	for (Entry<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> ide_doc_utter : SupertablaUtt.entrySet()) {
@@ -508,9 +512,9 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 				
 				total.add(utter_sem.getKey());
 				
-				List<CompleteDocuments> listaAsoc=utte_doc.get(utter_sem.getKey());
+				HashSet<CompleteDocuments> listaAsoc=utte_doc.get(utter_sem.getKey());
 				if (listaAsoc==null)
-					listaAsoc=new LinkedList<>();
+					listaAsoc=new HashSet<>();
 				
 				if (docI!=null)
 					listaAsoc.add(docI);
@@ -522,9 +526,9 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 				
 				utte_doc.put(utter_sem.getKey(), listaAsoc);
 				
-				List<CompleteDocuments> listaAsocEntry=utte_entry.get(utter_sem.getKey());
+				HashSet<CompleteDocuments> listaAsocEntry=utte_entry.get(utter_sem.getKey());
 				if (listaAsocEntry==null)
-					listaAsocEntry=new LinkedList<>();
+					listaAsocEntry=new HashSet<>();
 				
 				for (Entry<String, HashMap<String, HashSet<String>>> sem_terms : utter_sem.getValue().entrySet()) {
 					HashMap<String, CompleteDocuments> list_term_Doc = supertablaSemPos_Doc.get(sem_terms.getKey());
@@ -563,24 +567,30 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		uteruno.getDescription().add(nameElem);
 		
 		
-		List<CompleteDocuments> docum=utte_doc.get(utteruni);
+		HashSet<CompleteDocuments> docum=utte_doc.get(utteruni);
 		if (docum!=null)
-			for (int i = 0; i < docum.size(); i++) {
-				CompleteDocuments docre = docum.get(i);
+			{
+			List<CompleteDocuments> lista=new LinkedList<>(docum);
+			for (int i = 0; i < lista.size(); i++) {
+				CompleteDocuments docre = lista.get(i);
 				CompleteLinkElementType cl=docUttList.get(i);
 				
 				CompleteLinkElement linksRef=new CompleteLinkElement(cl,docre);
 				uteruno.getDescription().add(linksRef);
 			}
+			}
 		
-		List<CompleteDocuments> entryel=utte_entry.get(utteruni);
+		HashSet<CompleteDocuments> entryel=utte_entry.get(utteruni);
 		if (entryel!=null)
-			for (int i = 0; i < entryel.size(); i++) {
-				CompleteDocuments docre = entryel.get(i);
+			{
+			List<CompleteDocuments> lista=new LinkedList<>(entryel);
+			for (int i = 0; i < lista.size(); i++) {
+				CompleteDocuments docre = lista.get(i);
 				CompleteLinkElementType cl=termUttList.get(i);
 				
 				CompleteLinkElement linksRef=new CompleteLinkElement(cl,docre);
 				uteruno.getDescription().add(linksRef);
+			}
 			}
 		
 	}
