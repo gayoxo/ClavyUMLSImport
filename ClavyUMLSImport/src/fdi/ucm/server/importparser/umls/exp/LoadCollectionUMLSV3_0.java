@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
@@ -164,6 +163,11 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	CompleteGrammar Uterancia=new CompleteGrammar("Utterances", "Utterance Structure",Salida.getCollection());
 	C.getMetamodelGrammar().add(Uterancia);
 	
+	
+	CompleteTextElementType NombreUtte=new CompleteTextElementType("Nombre",Terminos);
+	Uterancia.getSons().add(NombreUtte);
+	UtteElem.put("Nombre", NombreUtte);
+	
 	//Lo bueno es que lo puedo calcular
 	
 	int numero_terminos=1;
@@ -263,8 +267,7 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	
 	HashMap<String, HashMap<String, CompleteDocuments>> supertablaSemPos_Doc=new HashMap<>();
 	HashMap<String, HashMap<String, CompleteDocuments>> supertablaSemNeg_Doc=new HashMap<>();
-	
-	
+
 	
 	String DocIcon="https://www.freeiconspng.com/uploads/document-icon-10.jpg";
 //	String icon="https://www.freeiconspng.com/uploads/blank-price-tag-png-11.png"; 
@@ -272,14 +275,16 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	
 	HashMap<CompleteDocuments, Integer> entry_docum_cnt = new HashMap<>();
 	HashMap<CompleteDocuments, Integer> docum_entry_cnt = new HashMap<>();
+	HashMap<String, CompleteDocuments> iden_docum = new HashMap<>();
 	
 	
+	//DOCUMENTOS Y TERMINOS
 	for (int i = 0; i < documentosList.size(); i++) {
 	String Iden = documentosList.get(i);
 		HashMap<String, List<HashMap<String, HashSet<String>>>> Table = supertabla.get(Iden);
 		CompleteDocuments Doc=new CompleteDocuments(C,Iden , DocIcon);
 		C.getEstructuras().add(Doc);
-		
+		iden_docum.put(Iden, Doc);
 		
 		CompleteTextElement DESC=new CompleteTextElement(Description, documentosListText.get(i) );
 		Doc.getDescription().add(DESC);
@@ -479,6 +484,99 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 		
 		
 	}
+	
+	
+	//UTERANCIAS Y TERMINOS
+	
+	HashMap<String, List<CompleteDocuments>> utte_doc=new HashMap<>();
+	HashMap<String, List<CompleteDocuments>> utte_entry=new HashMap<>();
+	HashSet<String> total=new HashSet<>();
+	
+	for (Entry<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> ide_doc_utter : SupertablaUtt.entrySet()) {
+		CompleteDocuments docI=iden_docum.get(ide_doc_utter.getKey());
+
+			for (Entry<String, HashMap<String, HashMap<String, HashSet<String>>>> utter_sem : ide_doc_utter.getValue().entrySet()) {
+				
+				total.add(utter_sem.getKey());
+				
+				List<CompleteDocuments> listaAsoc=utte_doc.get(utter_sem.getKey());
+				if (listaAsoc==null)
+					listaAsoc=new LinkedList<>();
+				
+				if (docI!=null)
+					listaAsoc.add(docI);
+				else
+					{
+					System.err.println("documento " +docI+" no encontrado");
+					Salida.getLogLines().add("documento " +docI+" no encontrado");
+					}
+				
+				utte_doc.put(utter_sem.getKey(), listaAsoc);
+				
+				List<CompleteDocuments> listaAsocEntry=utte_entry.get(utter_sem.getKey());
+				if (listaAsocEntry==null)
+					listaAsocEntry=new LinkedList<>();
+				
+				for (Entry<String, HashMap<String, HashSet<String>>> sem_terms : utter_sem.getValue().entrySet()) {
+					HashMap<String, CompleteDocuments> list_term_Doc = supertablaSemPos_Doc.get(sem_terms.getKey());
+					if (list_term_Doc!=null)
+					{
+						for (Entry<String, HashSet<String>> term_words : sem_terms.getValue().entrySet()) {
+							CompleteDocuments documentoTermino = list_term_Doc.get(term_words.getKey());
+							if (documentoTermino!=null)
+								listaAsocEntry.add(documentoTermino);
+							else
+							{
+							System.err.println("termino " +term_words.getKey()+" no encontrado");
+							Salida.getLogLines().add("termino " +term_words.getKey()+" no encontrado");
+							}
+						}
+						
+					}else
+					{
+					System.err.println("semantica " +sem_terms.getKey()+" no encontrado");
+					Salida.getLogLines().add("semantica " +sem_terms.getKey()+" no encontrado");
+					}
+				}
+				
+				utte_entry.put(utter_sem.getKey(), listaAsocEntry);
+				
+			}
+		
+	}
+	
+	String iconUtter="https://www.freeiconspng.com/uploads/maps-center-direction-icon-24.png"; 
+	for (String utteruni : total) {
+		CompleteDocuments uteruno=new CompleteDocuments(C, utteruni, iconUtter);
+		C.getEstructuras().add(uteruno);
+		
+		CompleteTextElement nameElem=new CompleteTextElement(NombreUtte, utteruni );
+		uteruno.getDescription().add(nameElem);
+		
+		
+		List<CompleteDocuments> docum=utte_doc.get(utteruni);
+		if (docum!=null)
+			for (int i = 0; i < docum.size(); i++) {
+				CompleteDocuments docre = docum.get(i);
+				CompleteLinkElementType cl=docUttList.get(i);
+				
+				CompleteLinkElement linksRef=new CompleteLinkElement(cl,docre);
+				uteruno.getDescription().add(linksRef);
+			}
+		
+		List<CompleteDocuments> entryel=utte_entry.get(utteruni);
+		if (entryel!=null)
+			for (int i = 0; i < entryel.size(); i++) {
+				CompleteDocuments docre = entryel.get(i);
+				CompleteLinkElementType cl=termUttList.get(i);
+				
+				CompleteLinkElement linksRef=new CompleteLinkElement(cl,docre);
+				uteruno.getDescription().add(linksRef);
+			}
+		
+	}
+	
+	
 	
 	for (CompleteTextElementType report_new : reportList) {
 		Terminos.getSons().add(report_new);
