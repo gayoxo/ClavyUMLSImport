@@ -21,6 +21,7 @@ import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
+import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 
@@ -28,15 +29,15 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
  * @author Joaquin Gayoso Cabada
  *
  */
-public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
+public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBase{
 
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LoadCollectionUMLSV3 LC=new LoadCollectionUMLSV3_0();
-		LoadCollectionUMLSV3.consoleDebug=true;
+		LoadCollectionUMLSVProtoBase LC=new LoadCollectionUMLSParaPrototipo();
+		LoadCollectionUMLSVProtoBase.consoleDebug=true;
 		
 		ArrayList<String> AA=new ArrayList<String>();
 		
@@ -119,90 +120,142 @@ public class LoadCollectionUMLSV3_0 extends LoadCollectionUMLSV3{
 	C.getMetamodelGrammar().add(Report);
 	
 	CompleteTextElementType clinical_Term=new CompleteTextElementType("Clinical Term",Report);
+	clinical_Term.setMultivalued(true);
 	Report.getSons().add(clinical_Term);
 	
+	clinical_Term.getShows().add(new CompleteOperationalValueType("editor", "proto", "clavy"));
+	clinical_Term.getShows().add(new CompleteOperationalValueType("proto", "type", "term"));
+	clinical_Term.getShows().add(new CompleteOperationalValueType("proto", "source", "auto"));
 	
 	
+	CompleteTextElementType utterances=new CompleteTextElementType("Utterances",Report);
+	utterances.setMultivalued(true);
+	Report.getSons().add(utterances);
 	
-	//Por aqui
-	
-	
-	
-	
-	HashMap<CompleteGrammar,HashMap<String, CompleteElementType>> TablaElem=new HashMap<>();
-	HashMap<CompleteTextElementType, List<CompleteTextElementType>> Report_Words = new HashMap<>();
-	
-	//Catalogue Entry
-	
-	CompleteGrammar Terminos=new CompleteGrammar("Catalogue Entry", "Entry Structure",Salida.getCollection());
-	C.getMetamodelGrammar().add(Terminos);
+	utterances.getShows().add(new CompleteOperationalValueType("proto", "type", "utterance"));
 	
 	
-	HashMap<String, CompleteElementType> TerrminosElem= new HashMap<String, CompleteElementType>();
+	CompleteResourceElementType images=new CompleteResourceElementType("images",Report);
+	images.setMultivalued(true);
+	Report.getSons().add(images);
 	
-	CompleteTextElementType clinical_Term=new CompleteTextElementType("Clinical Term",Terminos);
-	Terminos.getSons().add(clinical_Term);
+	images.getShows().add(new CompleteOperationalValueType("proto", "type", "image"));
 	
-	TerrminosElem.put("Clinical Term", clinical_Term);
+	CompleteElementType del=new CompleteElementType("delete",Report);
+	del.setSelectable(true);
+	Report.getSons().add(del);
 	
-	CompleteTextElementType occurrence=new CompleteTextElementType("Occurrence",Terminos);
-	Terminos.getSons().add(occurrence);
+	del.getShows().add(new CompleteOperationalValueType("proto", "type", "delete"));
 	
-	TerrminosElem.put("Occurrence", occurrence);
+	CompleteTextElementType Annotation=new CompleteTextElementType("Annotation",Report);
+	Report.getSons().add( Annotation);
 	
-	CompleteTextElementType Categoria=new CompleteTextElementType("Category",Terminos);
-	Terminos.getSons().add(Categoria);
-	Categoria.setBrowseable(true);
-	
-	TerrminosElem.put("Category", Categoria);
-	
-	CompleteTextElementType report=new CompleteTextElementType("Report*",Terminos);
-	Terminos.getSons().add(report);
-	report.setMultivalued(true);
-	TerrminosElem.put("Report*", report);
-	
-	CompleteTextElementType Words=new CompleteTextElementType("Words",report,Terminos);
-	//report.getSons().add(Words);
-	Words.setMultivalued(true);
-	
-	LinkedList<CompleteTextElementType> Words_rep=new LinkedList<>();
-	Words_rep.add(Words);
-	
-	Report_Words.put(report, Words_rep);
-	
-	TerrminosElem.put("Words", Words);
-	
-	CompleteLinkElementType report_Link=new CompleteLinkElementType("Report Link",report,Terminos);
-	report.getSons().add(report_Link);
-	
-	TerrminosElem.put("Report Link", report_Link);
-	
-	List<CompleteTextElementType> reportList=new ArrayList<>();
-	reportList.add(report);
+	Annotation.getShows().add(new CompleteOperationalValueType("proto", "type", "annotation"));
 	
 	
-	CompleteLinkElementType utterance_Link=new CompleteLinkElementType("Uterances*",Terminos);
-	utterance_Link.setMultivalued(true);
+	CompleteTextElementType Position=new CompleteTextElementType("Position",clinical_Term,Report);
+	Position.setMultivalued(true);
+	clinical_Term.getSons().add(Position);
 	
-	TerrminosElem.put("Uterances*", utterance_Link);
-	
-	List<CompleteLinkElementType> utterance_Link_List=new ArrayList<>();
-	utterance_Link_List.add(utterance_Link);
-	
-	TablaElem.put(Terminos,TerrminosElem);
-	
-	//TABAJAMOS en utterancias
-	
-	HashMap<String, CompleteElementType> UtteElem= new HashMap<String, CompleteElementType>();
+	Position.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
 	
 	
-	CompleteGrammar Uterancia=new CompleteGrammar("Utterances", "Utterance Structure",Salida.getCollection());
-	C.getMetamodelGrammar().add(Uterancia);
+	CompleteTextElementType Semantic=new CompleteTextElementType("Semantic",clinical_Term,Report);
+	Semantic.setMultivalued(true);
+	clinical_Term.getSons().add(Semantic);
+	
+	Position.getShows().add(new CompleteOperationalValueType("proto", "type", "semantic"));
 	
 	
-	CompleteTextElementType NombreUtte=new CompleteTextElementType("Nombre",Terminos);
-	Uterancia.getSons().add(NombreUtte);
-	UtteElem.put("Nombre", NombreUtte);
+	CompleteElementType ty_del=new CompleteElementType("delete",clinical_Term,Report);
+	ty_del.setSelectable(true);
+	clinical_Term.getSons().add(ty_del);
+	
+	ty_del.getShows().add(new CompleteOperationalValueType("proto", "type", "delete"));
+	
+	CompleteTextElementType CUI=new CompleteTextElementType("cui",clinical_Term,Report);
+	clinical_Term.getSons().add( CUI);
+	
+	CUI.getShows().add(new CompleteOperationalValueType("proto", "type", "cui"));
+//	//Por aqui
+//	
+//	
+//	
+//	
+//	HashMap<CompleteGrammar,HashMap<String, CompleteElementType>> TablaElem=new HashMap<>();
+//	HashMap<CompleteTextElementType, List<CompleteTextElementType>> Report_Words = new HashMap<>();
+//	
+//	//Catalogue Entry
+//	
+//	CompleteGrammar Terminos=new CompleteGrammar("Catalogue Entry", "Entry Structure",Salida.getCollection());
+//	C.getMetamodelGrammar().add(Terminos);
+//	
+//	
+//	HashMap<String, CompleteElementType> TerrminosElem= new HashMap<String, CompleteElementType>();
+//	
+//	CompleteTextElementType clinical_Term=new CompleteTextElementType("Clinical Term",Terminos);
+//	Terminos.getSons().add(clinical_Term);
+//	
+//	TerrminosElem.put("Clinical Term", clinical_Term);
+//	
+//	CompleteTextElementType occurrence=new CompleteTextElementType("Occurrence",Terminos);
+//	Terminos.getSons().add(occurrence);
+//	
+//	TerrminosElem.put("Occurrence", occurrence);
+//	
+//	CompleteTextElementType Categoria=new CompleteTextElementType("Category",Terminos);
+//	Terminos.getSons().add(Categoria);
+//	Categoria.setBrowseable(true);
+//	
+//	TerrminosElem.put("Category", Categoria);
+//	
+//	CompleteTextElementType report=new CompleteTextElementType("Report*",Terminos);
+//	Terminos.getSons().add(report);
+//	report.setMultivalued(true);
+//	TerrminosElem.put("Report*", report);
+//	
+//	CompleteTextElementType Words=new CompleteTextElementType("Words",report,Terminos);
+//	//report.getSons().add(Words);
+//	Words.setMultivalued(true);
+//	
+//	LinkedList<CompleteTextElementType> Words_rep=new LinkedList<>();
+//	Words_rep.add(Words);
+//	
+//	Report_Words.put(report, Words_rep);
+//	
+//	TerrminosElem.put("Words", Words);
+//	
+//	CompleteLinkElementType report_Link=new CompleteLinkElementType("Report Link",report,Terminos);
+//	report.getSons().add(report_Link);
+//	
+//	TerrminosElem.put("Report Link", report_Link);
+//	
+//	List<CompleteTextElementType> reportList=new ArrayList<>();
+//	reportList.add(report);
+//	
+//	
+//	CompleteLinkElementType utterance_Link=new CompleteLinkElementType("Uterances*",Terminos);
+//	utterance_Link.setMultivalued(true);
+//	
+//	TerrminosElem.put("Uterances*", utterance_Link);
+//	
+//	List<CompleteLinkElementType> utterance_Link_List=new ArrayList<>();
+//	utterance_Link_List.add(utterance_Link);
+//	
+//	TablaElem.put(Terminos,TerrminosElem);
+//	
+//	//TABAJAMOS en utterancias
+//	
+//	HashMap<String, CompleteElementType> UtteElem= new HashMap<String, CompleteElementType>();
+//	
+//	
+//	CompleteGrammar Uterancia=new CompleteGrammar("Utterances", "Utterance Structure",Salida.getCollection());
+//	C.getMetamodelGrammar().add(Uterancia);
+//	
+//	
+//	CompleteTextElementType NombreUtte=new CompleteTextElementType("Nombre",Terminos);
+//	Uterancia.getSons().add(NombreUtte);
+//	UtteElem.put("Nombre", NombreUtte);
 	
 	//Lo bueno es que lo puedo calcular
 	

@@ -33,7 +33,7 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
  * @author Joaquin Gayoso Cabada
  *
  */
-public abstract class LoadCollectionUMLSV3 extends LoadCollection{
+public abstract class LoadCollectionUMLSVProtoBase extends LoadCollection{
 
 
 	
