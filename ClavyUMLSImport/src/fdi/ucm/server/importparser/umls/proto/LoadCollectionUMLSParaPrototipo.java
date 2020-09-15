@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
@@ -110,8 +112,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		   HashMap<String, HashMap<String, HashSet<String>>> supertablaSemPos, HashMap<String, String> TablaSemanticaTexto,
 		   HashMap<String, HashSet<String>> imagenes_Tabla, CompleteCollectionAndLog Salida,
 		   HashMap<String, HashMap<String, HashMap<String, HashMap<String,HashSet<String>>>>> SupertablaUtt,
-			HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>> Utter_Text,
-			HashMap<String, List<String>> Utter_do) {
+		   HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> supertablaUtt_list) {
 	
 	CompleteCollection C=new CompleteCollection("MetaMap ", "MetaMap  collection");
 	Salida.setCollection(C);
@@ -119,27 +120,138 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	CompleteGrammar Report=new CompleteGrammar("Report", "Report Data CARS",Salida.getCollection());
 	C.getMetamodelGrammar().add(Report);
 	
+	
+	//CONTEOTERMINOS POR DOCUMENTO
+	
+		int numero_terminos=1;
+		
+		for (Entry<String, HashMap<String, List<HashMap<String, HashSet<String>>>>> uterance_seman : supertabla.entrySet()) {
+			HashSet<String> TermninosDoc=new HashSet<String>();
+			for (Entry<String, List<HashMap<String, HashSet<String>>>> seman_terms : uterance_seman.getValue().entrySet())
+				for (HashMap<String, HashSet<String>> string : seman_terms.getValue()) {
+					for (String string2 : string.keySet()) {
+						TermninosDoc.add(string2);
+					}
+				}
+			
+			if (TermninosDoc.size()>numero_terminos)
+				numero_terminos=TermninosDoc.size();
+		}
+		
+		
+		int numero_terminos_posicion=1;
+		int numero_terminos_seman=1;
+		
+		for (Entry<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> uterance_seman : supertablaUtt_list.entrySet()) { 
+			HashMap<String, Integer> term_wordsco=new HashMap<String, Integer>();
+			HashSet<String> SemanList=new HashSet<String>();
+			for (Entry<String, HashMap<String, HashMap<String, HashSet<String>>>> seman_terms : uterance_seman.getValue().entrySet()) {
+				for (Entry<String, HashMap<String, HashSet<String>>> seman_terms2 : seman_terms.getValue().entrySet()) 
+					for (Entry<String, HashSet<String>> string : seman_terms2.getValue().entrySet()) {
+						Integer valorcom=term_wordsco.get(string.getKey());
+						if (valorcom==null)
+							valorcom=0;
+						valorcom=new Integer(valorcom.intValue()+string.getValue().size());
+						term_wordsco.put(string.getKey(), valorcom);
+					}
+				
+					SemanList.addAll(seman_terms.getValue().keySet());
+					
+				}
+			
+			
+			
+			for (Entry<String, Integer> interco : term_wordsco.entrySet()) {
+				if (interco.getValue()>numero_terminos_posicion)
+					numero_terminos_posicion=interco.getValue();
+			}
+			
+				if (SemanList.size()>numero_terminos_seman)
+					numero_terminos_seman=SemanList.size();
+			
+			
+		}
+		
+		int numero_uters=1;
+		
+		for (Entry<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> uterance_seman : SupertablaUtt.entrySet()) {
+
+			
+			if (uterance_seman.getValue().keySet().size()>numero_uters)
+				numero_uters=uterance_seman.getValue().keySet().size();
+		}
+		
+		
+		int numero_image=1;
+		
+		LinkedList<String> valore = new LinkedList<String>(imagenes_Tabla.keySet());
+		
+		for (int i = 0; i < valore.size(); i++) {
+			ArrayList<String> tablaaa = new ArrayList<String>(imagenes_Tabla.get(valore.get(i)));
+
+			if (tablaaa.size()>numero_image)
+				numero_image=tablaaa.size();
+		}
+	
+	List<CompleteTextElementType> clinical_TermList=new LinkedList<CompleteTextElementType>();
+		
 	CompleteTextElementType clinical_Term=new CompleteTextElementType("Clinical Term",Report);
 	clinical_Term.setMultivalued(true);
 	Report.getSons().add(clinical_Term);
+	clinical_TermList.add(clinical_Term);
 	
-	clinical_Term.getShows().add(new CompleteOperationalValueType("editor", "proto", "clavy"));
-	clinical_Term.getShows().add(new CompleteOperationalValueType("proto", "type", "term"));
-	clinical_Term.getShows().add(new CompleteOperationalValueType("proto", "source", "auto"));
+	for (int i = 0; i < numero_terminos; i++) {
+		CompleteTextElementType clinical_TermH=new CompleteTextElementType("Clinical Term",Report);
+		clinical_TermH.setMultivalued(true);
+		clinical_TermH.setClassOfIterator(clinical_Term);
+		Report.getSons().add(clinical_TermH);
+		clinical_TermList.add(clinical_TermH);
+	}
 	
+	for (CompleteTextElementType clinical_TermH : clinical_TermList) {
+		clinical_TermH.getShows().add(new CompleteOperationalValueType("editor", "proto", "clavy"));
+		clinical_TermH.getShows().add(new CompleteOperationalValueType("proto", "type", "term"));
+		clinical_TermH.getShows().add(new CompleteOperationalValueType("proto", "source", "auto"));
+	}
+	
+	List<CompleteTextElementType> utterancesList=new LinkedList<CompleteTextElementType>();
 	
 	CompleteTextElementType utterances=new CompleteTextElementType("Utterances",Report);
 	utterances.setMultivalued(true);
 	Report.getSons().add(utterances);
-	
 	utterances.getShows().add(new CompleteOperationalValueType("proto", "type", "utterance"));
+	utterancesList.add(utterances);
 	
+	
+	for (int i = 0; i < numero_uters; i++) {
+		CompleteTextElementType utterancesH=new CompleteTextElementType("Utterances",Report);
+		utterancesH.setMultivalued(true);
+		utterancesH.setClassOfIterator(utterances);
+		Report.getSons().add(utterancesH);
+		utterancesList.add(utterancesH);
+		utterancesH.getShows().add(new CompleteOperationalValueType("proto", "type", "utterance"));
+	}
+	
+	
+	List<CompleteResourceElementType> imagesList=new LinkedList<CompleteResourceElementType>();
+
 	
 	CompleteResourceElementType images=new CompleteResourceElementType("images",Report);
 	images.setMultivalued(true);
 	Report.getSons().add(images);
 	
 	images.getShows().add(new CompleteOperationalValueType("proto", "type", "image"));
+	imagesList.add(images);
+	
+	for (int i = 0; i < numero_image; i++) {
+		CompleteResourceElementType imagesH=new CompleteResourceElementType("images",Report);
+		imagesH.setMultivalued(true);
+		imagesH.setClassOfIterator(images);
+		Report.getSons().add(imagesH);
+		imagesList.add(imagesH);
+		imagesH.getShows().add(new CompleteOperationalValueType("proto", "type", "image"));
+	}
+	
 	
 	CompleteElementType del=new CompleteElementType("delete",Report);
 	del.setSelectable(true);
@@ -153,12 +265,31 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	Annotation.getShows().add(new CompleteOperationalValueType("proto", "type", "annotation"));
 	
 	
+	
+	//TODO AQUI ESTA LA TARA
+	
+	HashMap<CompleteTextElementType,List<CompleteTextElementType>> PositionListHash=new HashMap<CompleteTextElementType,List<CompleteTextElementType>>();
+	
+	List<CompleteTextElementType> PositionList=new LinkedList<CompleteTextElementType>();
+	
 	CompleteTextElementType Position=new CompleteTextElementType("Position",clinical_Term,Report);
 	Position.setMultivalued(true);
 	clinical_Term.getSons().add(Position);
 	
 	Position.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
 	
+	PositionList.add(Position);
+	
+	for (int i = 0; i < numero_terminos_posicion-1; i++) {
+		CompleteTextElementType PositionH=new CompleteTextElementType("Position",clinical_Term,Report);
+		PositionH.setMultivalued(true);
+		clinical_Term.getSons().add(PositionH);
+		PositionH.setClassOfIterator(Position);
+		PositionH.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
+		PositionList.add(PositionH);
+	}
+	
+	PositionListHash.put(clinical_Term, PositionList);
 	
 	CompleteTextElementType Semantic=new CompleteTextElementType("Semantic",clinical_Term,Report);
 	Semantic.setMultivalued(true);
@@ -177,6 +308,34 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	clinical_Term.getSons().add( CUI);
 	
 	CUI.getShows().add(new CompleteOperationalValueType("proto", "type", "cui"));
+	
+	
+	
+	
+	
+	
+	for (CompleteTextElementType ceteClini : clinical_TermList) 
+		if (ceteClini!=clinical_Term)
+		{
+			
+			List<CompleteTextElementType> ceteCliniList=new LinkedList<CompleteTextElementType>();
+			
+			for (int i = 0; i < numero_terminos_posicion; i++) {
+				CompleteTextElementType PositionH=new CompleteTextElementType("Position",ceteClini,Report);
+				PositionH.setMultivalued(true);
+				ceteClini.getSons().add(PositionH);
+				PositionH.setClassOfIterator(Position);
+				PositionH.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
+				ceteCliniList.add(PositionH);
+			}
+			
+			PositionListHash.put(ceteClini, ceteCliniList);
+		}
+	
+	
+	
+	
+	
 //	//Por aqui
 //	
 //	
@@ -258,6 +417,8 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 //	UtteElem.put("Nombre", NombreUtte);
 	
 	//Lo bueno es que lo puedo calcular
+
+	/**
 	
 	int numero_terminos=1;
 	
@@ -643,6 +804,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		
 	}
 	
+		
 	
 	HashMap<String, CompleteDocuments> utte_docum_equi=new HashMap<>();
 	
@@ -809,7 +971,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		
 	}
 	
-	
+**/
 	
 		
 	return Salida;
@@ -820,7 +982,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 
 	@Override
 	public String getName() {
-		return "UMLS Import V1";
+		return "UMLS Import Proto V1";
 	}
 
 
