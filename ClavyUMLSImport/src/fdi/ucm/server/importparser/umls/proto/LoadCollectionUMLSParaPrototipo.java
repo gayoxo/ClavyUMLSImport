@@ -7,22 +7,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
-
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteCollectionAndLog;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
-import fdi.ucm.server.modelComplete.collection.document.CompleteLinkElement;
 import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementURL;
 import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
@@ -142,8 +139,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		
 		int numero_terminos_posicion=1;
 		int numero_terminos_seman=1;
-		
-		HashMap<String, List<HashMap<String, HashSet<String>>>> ListafinVNec=new HashMap<String, List<HashMap<String,HashSet<String>>>>();
+
 		
 		for (Entry<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> uterance_seman : supertablaUtt_list.entrySet()) { 
 			HashMap<String, HashSet<String>> term_wordsco=new HashMap<String, HashSet<String>>();
@@ -183,10 +179,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 			}
 			
 				
-			List<HashMap<String, HashSet<String>>> vlistilla= new LinkedList<HashMap<String, HashSet<String>>>();
-			vlistilla.add(term_wordsco);
-			vlistilla.add(term_seman);
-			ListafinVNec.put(uterance_seman.getKey(), vlistilla);
+
 			
 		}
 		
@@ -228,8 +221,8 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	
 	for (CompleteTextElementType clinical_TermH : clinical_TermList) {
 		clinical_TermH.getShows().add(new CompleteOperationalValueType("editor", "proto", "clavy"));
-		clinical_TermH.getShows().add(new CompleteOperationalValueType("proto", "type", "term"));
-		clinical_TermH.getShows().add(new CompleteOperationalValueType("proto", "source", "auto"));
+		clinical_TermH.getShows().add(new CompleteOperationalValueType("type", "term", "proto"));
+		clinical_TermH.getShows().add(new CompleteOperationalValueType("source", "auto","proto" ));
 	}
 	
 	List<CompleteTextElementType> utterancesList=new LinkedList<CompleteTextElementType>();
@@ -237,7 +230,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	CompleteTextElementType utterances=new CompleteTextElementType("Utterances",Report);
 	utterances.setMultivalued(true);
 	Report.getSons().add(utterances);
-	utterances.getShows().add(new CompleteOperationalValueType("proto", "type", "utterance"));
+	utterances.getShows().add(new CompleteOperationalValueType("type", "utterance","proto" ));
 	utterancesList.add(utterances);
 	
 	
@@ -247,7 +240,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		utterancesH.setClassOfIterator(utterances);
 		Report.getSons().add(utterancesH);
 		utterancesList.add(utterancesH);
-		utterancesH.getShows().add(new CompleteOperationalValueType("proto", "type", "utterance"));
+		utterancesH.getShows().add(new CompleteOperationalValueType("type", "utterance","proto" ));
 	}
 	
 	
@@ -258,7 +251,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	images.setMultivalued(true);
 	Report.getSons().add(images);
 	
-	images.getShows().add(new CompleteOperationalValueType("proto", "type", "image"));
+	images.getShows().add(new CompleteOperationalValueType("type", "image","proto" ));
 	imagesList.add(images);
 	
 	for (int i = 0; i < numero_image; i++) {
@@ -267,7 +260,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		imagesH.setClassOfIterator(images);
 		Report.getSons().add(imagesH);
 		imagesList.add(imagesH);
-		imagesH.getShows().add(new CompleteOperationalValueType("proto", "type", "image"));
+		imagesH.getShows().add(new CompleteOperationalValueType("type", "image","proto" ));
 	}
 	
 	
@@ -275,12 +268,12 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	del.setSelectable(true);
 	Report.getSons().add(del);
 	
-	del.getShows().add(new CompleteOperationalValueType("proto", "type", "delete"));
+	del.getShows().add(new CompleteOperationalValueType("type", "delete","proto" ));
 	
 	CompleteTextElementType Annotation=new CompleteTextElementType("Annotation",Report);
 	Report.getSons().add( Annotation);
 	
-	Annotation.getShows().add(new CompleteOperationalValueType("proto", "type", "annotation"));
+	Annotation.getShows().add(new CompleteOperationalValueType("type", "annotation","proto" ));
 	
 
 	HashMap<CompleteTextElementType,List<CompleteTextElementType>> PositionListHash=new HashMap<CompleteTextElementType,List<CompleteTextElementType>>();
@@ -291,7 +284,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 	Position.setMultivalued(true);
 	clinical_Term.getSons().add(Position);
 	
-	Position.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
+	Position.getShows().add(new CompleteOperationalValueType("type", "position","proto" ));
 	
 	PositionList.add(Position);
 	
@@ -300,7 +293,7 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		PositionH.setMultivalued(true);
 		clinical_Term.getSons().add(PositionH);
 		PositionH.setClassOfIterator(Position);
-		PositionH.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
+		PositionH.getShows().add(new CompleteOperationalValueType("type", "position","proto" ));
 		PositionList.add(PositionH);
 	}
 	
@@ -315,7 +308,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 	Semantic.setMultivalued(true);
 	clinical_Term.getSons().add(Semantic);
 	
-	Position.getShows().add(new CompleteOperationalValueType("proto", "type", "semantic"));
+	Semantic.getShows().add(new CompleteOperationalValueType("type", "semantic","proto" ));
 	
 	SemanticList.add(Semantic);
 	
@@ -324,7 +317,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 		SemanticH.setMultivalued(true);
 		clinical_Term.getSons().add(SemanticH);
 		SemanticH.setClassOfIterator(Semantic);
-		SemanticH.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
+		SemanticH.getShows().add(new CompleteOperationalValueType("type", "semantic","proto" ));
 		SemanticList.add(SemanticH);
 	}
 	
@@ -337,7 +330,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 	ty_del.setSelectable(true);
 	clinical_Term.getSons().add(ty_del);
 	
-	ty_del.getShows().add(new CompleteOperationalValueType("proto", "type", "delete"));
+	ty_del.getShows().add(new CompleteOperationalValueType("type", "delete","proto" ));
 	
 	ty_delHash.put(clinical_Term, ty_del);
 	
@@ -347,7 +340,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 	CompleteTextElementType CUI=new CompleteTextElementType("cui",clinical_Term,Report);
 	clinical_Term.getSons().add( CUI);
 	
-	CUI.getShows().add(new CompleteOperationalValueType("proto", "type", "cui"));
+	CUI.getShows().add(new CompleteOperationalValueType("type", "cui","proto" ));
 	
 	CUIHash.put(clinical_Term, CUI);
 	
@@ -365,7 +358,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 				PositionH.setMultivalued(true);
 				ceteClini.getSons().add(PositionH);
 				PositionH.setClassOfIterator(Position);
-				PositionH.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
+				PositionH.getShows().add(new CompleteOperationalValueType("type", "position","proto" ));
 				ceteCliniList.add(PositionH);
 			}
 			
@@ -379,7 +372,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 				SemanticH.setMultivalued(true);
 				ceteClini.getSons().add(SemanticH);
 				SemanticH.setClassOfIterator(Semantic);
-				SemanticH.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
+				SemanticH.getShows().add(new CompleteOperationalValueType( "type", "semantic","proto" ));
 				SemanticListList.add(SemanticH);
 			}
 			
@@ -391,7 +384,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 			ceteClini.getSons().add(ty_delH);
 			ty_delH.setClassOfIterator(ty_del);
 			
-			ty_delH.getShows().add(new CompleteOperationalValueType("proto", "type", "delete"));
+			ty_delH.getShows().add(new CompleteOperationalValueType("type", "delete","proto" ));
 			
 			ty_delHash.put(ceteClini, ty_del);
 			
@@ -401,7 +394,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 			
 			CUIH.setClassOfIterator(CUI);
 			
-			CUIH.getShows().add(new CompleteOperationalValueType("proto", "type", "cui"));
+			CUIH.getShows().add(new CompleteOperationalValueType("type", "cui","proto" ));
 			
 			CUIHash.put(ceteClini, CUIH);
 		}
@@ -422,6 +415,8 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 	for (int i = 0; i < documentosList.size(); i++) {
 	String Iden = documentosList.get(i);
 		HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>> TableH = supertablaUtt_list.get(Iden);
+
+		String[] utte=documentosListText.get(Iden).split("\\.");
 		
 		StringBuffer Desc=new StringBuffer();
 		
@@ -432,13 +427,43 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 		C.getEstructuras().add(Doc);
 		iden_docum.put(Iden, Doc);
 		
+		HashMap<String, Integer> variacion=new HashMap<String, Integer>();
+		
+		int acumulado = 0;
+		for (String string : utte) {
+			variacion.put((string+".").trim(), new Integer(acumulado));
+			String copia=new String(string);
+			copia=copia.replace(",", "");
+			copia=copia.replace(".", "");
+			copia=copia.replace("  ", " ");
+			String[] conteo = copia.split(" ");
+			int conteoI = 0;
+			for (String string2 : conteo) 
+				if (!string2.trim().isEmpty())
+					conteoI++;
+			acumulado=acumulado+conteoI;
+		}
+		
+		LinkedList<String> imagenes = new LinkedList<String>(imagenes_Tabla.get(Iden));
+		
+		if (imagenes!=null)
+		{
+		int contadorima = 0;
+		for (String urlstring : imagenes) {
+			CompleteResourceElementType imageType = imagesList.get(contadorima);
+			CompleteResourceElementURL CRU=new CompleteResourceElementURL(imageType,  urlstring);
+			Doc.getDescription().add(CRU);
+			contadorima++;
+		}
+		}
+		
 		if (TableH!=null)
 		{
 			int cont=0;
-			for (String uterancia : TableH.keySet()) {
-				Desc.append(uterancia);
+			for (String uterancia : utte) {
+				Desc.append(uterancia+".");
 				CompleteTextElementType type = utterancesList.get(cont);
-				CompleteTextElement CTU=new CompleteTextElement(type, uterancia);
+				CompleteTextElement CTU=new CompleteTextElement(type, uterancia+".");
 				Doc.getDescription().add(CTU);
 				cont++;
 			}
@@ -447,26 +472,65 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 			
 			Doc.setDescriptionText(Desc.toString());
 		}
-			
-		List<HashMap<String, HashSet<String>>> listilla = ListafinVNec.get(Iden);
+		
+		
+
+		
+			HashMap<String, HashSet<String>> term_wordsco=new HashMap<String, HashSet<String>>();
+			HashMap<String, HashSet<String>> term_seman=new  HashMap<String, HashSet<String>>();
+			for (Entry<String, HashMap<String, HashMap<String, HashSet<String>>>> seman_terms : TableH.entrySet()) {
+				for (Entry<String, HashMap<String, HashSet<String>>> seman_terms2 : seman_terms.getValue().entrySet()) 
+					for (Entry<String, HashSet<String>> string : seman_terms2.getValue().entrySet()) {
+						String completo=seman_terms.getKey().trim();
+						if (!seman_terms.getKey().trim().endsWith("."))
+							completo=completo+".";
+						
+						HashSet<String> valorcom=term_wordsco.get(string.getKey());
+						if (valorcom==null)
+							valorcom=new HashSet<String>();
+						
+						HashSet<String> variados=new HashSet<String>();
+						for (String string2 : string.getValue()) {
+							Integer varia=variacion.get(completo);
+							if (varia==null)
+							{
+								Salida.getLogLines().add("Error, not found \""+ seman_terms.getKey() + "\" in "+ Arrays.toString(variacion.keySet().toArray()));
+								varia=0;
+								
+							}
+							variados.add(Integer.toString((Integer.parseInt(string2))+varia));
+						}
+						
+						valorcom.addAll(variados);
+						term_wordsco.put(string.getKey(), valorcom);
+						
+						HashSet<String> valorcomsem=term_seman.get(string.getKey());
+						
+						if (valorcomsem==null)
+							valorcomsem=new HashSet<String>();
+						valorcomsem.add(seman_terms2.getKey());
+						term_seman.put(string.getKey(), valorcomsem);
+						
+					}
+				
+
 					
-		if (listilla!=null)
-		{
-			HashMap<String, HashSet<String>> listaP = listilla.get(0);
-			HashMap<String, HashSet<String>> listaS = listilla.get(1);
+				}
 			
-			List<String> terms=new LinkedList<String>(listaP.keySet());
+
+			
+			List<String> terms=new LinkedList<String>(term_wordsco.keySet());
 			
 			for (int j = 0; j < terms.size(); j++) {
 				String Term=terms.get(j);
 				CompleteTextElementType clinical_TermPos = clinical_TermList.get(j);
 				
-				HashSet<String> listaPos = listaP.get(Term);
+				HashSet<String> listaPos = term_wordsco.get(Term);
 				if (listaPos==null)
 					listaPos=new HashSet<String>();
 				LinkedList<String> listaPosR = new LinkedList<String>(listaPos);
 				
-				HashSet<String> listaSem = listaS.get(Term);
+				HashSet<String> listaSem = term_seman.get(Term);
 				if (listaSem==null)
 					listaSem=new HashSet<String>();
 				LinkedList<String> listaSemR = new LinkedList<String>(listaSem);
@@ -506,7 +570,7 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 			}
 			
 			
-		}
+		
 	}
 	
 	
