@@ -112,7 +112,8 @@ public class LoadCollectionUMLSParaPrototipo extends LoadCollectionUMLSVProtoBas
 		   HashMap<String, HashMap<String, HashSet<String>>> supertablaSemPos, HashMap<String, String> TablaSemanticaTexto,
 		   HashMap<String, HashSet<String>> imagenes_Tabla, CompleteCollectionAndLog Salida,
 		   HashMap<String, HashMap<String, HashMap<String, HashMap<String,HashSet<String>>>>> SupertablaUtt,
-		   HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> supertablaUtt_list) {
+		   HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> supertablaUtt_list,
+		   HashMap<String,HashMap<String,String>> Sem_Term_CUI) {
 	
 	CompleteCollection C=new CompleteCollection("MetaMap ", "MetaMap  collection");
 	Salida.setCollection(C);
@@ -371,16 +372,18 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 			PositionListHash.put(ceteClini, ceteCliniList);
 			
 			
+			List<CompleteTextElementType> SemanticListList=new LinkedList<CompleteTextElementType>();
+			
 			for (int i = 0; i < numero_terminos_seman; i++) {
 				CompleteTextElementType SemanticH=new CompleteTextElementType("Semantic",ceteClini,Report);
 				SemanticH.setMultivalued(true);
 				ceteClini.getSons().add(SemanticH);
 				SemanticH.setClassOfIterator(Semantic);
 				SemanticH.getShows().add(new CompleteOperationalValueType("proto", "type", "position"));
-				SemanticList.add(SemanticH);
+				SemanticListList.add(SemanticH);
 			}
 			
-			SemanticHash.put(ceteClini, SemanticList);
+			SemanticHash.put(ceteClini, SemanticListList);
 			
 			
 			CompleteElementType ty_delH=new CompleteElementType("delete",ceteClini,Report);
@@ -408,6 +411,12 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 //	String iconEntry="https://www.freeiconspng.com/uploads/blank-price-tag-png-11.png"; 
 	
 	HashMap<String, CompleteDocuments> iden_docum = new HashMap<>();
+	HashMap<String, String> term_cui=new HashMap<String, String>();
+	
+	for (Entry<String, HashMap<String, String>> hashMap : Sem_Term_CUI.entrySet()) 
+		for (Entry<String, String> hashMap2 : hashMap.getValue().entrySet()) 
+			term_cui.put(hashMap2.getKey(), hashMap2.getValue());
+	
 	
 	//DOCUMENTOS Y TERMINOS
 	for (int i = 0; i < documentosList.size(); i++) {
@@ -438,7 +447,66 @@ HashMap<CompleteTextElementType,List<CompleteTextElementType>> SemanticHash=new 
 			
 			Doc.setDescriptionText(Desc.toString());
 		}
-		
+			
+		List<HashMap<String, HashSet<String>>> listilla = ListafinVNec.get(Iden);
+					
+		if (listilla!=null)
+		{
+			HashMap<String, HashSet<String>> listaP = listilla.get(0);
+			HashMap<String, HashSet<String>> listaS = listilla.get(1);
+			
+			List<String> terms=new LinkedList<String>(listaP.keySet());
+			
+			for (int j = 0; j < terms.size(); j++) {
+				String Term=terms.get(j);
+				CompleteTextElementType clinical_TermPos = clinical_TermList.get(j);
+				
+				HashSet<String> listaPos = listaP.get(Term);
+				if (listaPos==null)
+					listaPos=new HashSet<String>();
+				LinkedList<String> listaPosR = new LinkedList<String>(listaPos);
+				
+				HashSet<String> listaSem = listaS.get(Term);
+				if (listaSem==null)
+					listaSem=new HashSet<String>();
+				LinkedList<String> listaSemR = new LinkedList<String>(listaSem);
+				
+				
+				List<CompleteTextElementType> listaPosCT = PositionListHash.get(clinical_TermPos);
+				List<CompleteTextElementType> listaSemCT = SemanticHash.get(clinical_TermPos);
+				CompleteTextElementType cuiT = CUIHash.get(clinical_TermPos);
+				
+				CompleteTextElement CTETErm=new CompleteTextElement(clinical_TermPos, Term);
+				Doc.getDescription().add(CTETErm);
+				
+				for (int k = 0; k < listaPosR.size(); k++) {
+						String position=listaPosR.get(k);
+						CompleteTextElementType positioType=listaPosCT.get(k);
+						CompleteTextElement CTEPos=new CompleteTextElement(positioType,position);
+						Doc.getDescription().add(CTEPos);
+
+					}
+
+					for (int k = 0; k < listaSemR.size(); k++) {
+						String semantica=listaSemR.get(k);
+						CompleteTextElementType semanType=listaSemCT.get(k);
+						CompleteTextElement CTESeman=new CompleteTextElement(semanType,semantica);
+						Doc.getDescription().add(CTESeman);
+
+					}
+				
+				String CuiVAlue = term_cui.get(Term);	
+				if (CuiVAlue!=null)
+				{
+					CompleteTextElement CTECui=new CompleteTextElement(cuiT,CuiVAlue);
+					Doc.getDescription().add(CTECui);
+					
+				}
+				
+			}
+			
+			
+		}
 	}
 	
 	

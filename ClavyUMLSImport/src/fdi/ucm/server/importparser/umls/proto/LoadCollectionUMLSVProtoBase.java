@@ -70,6 +70,7 @@ public abstract class LoadCollectionUMLSVProtoBase extends LoadCollection{
 		HashMap<String,String> TablaSemanticaTexto=new HashMap<String,String>();
 		HashMap<String, HashMap<String, HashMap<String, HashMap<String,HashSet<String>>>>> SupertablaUtt=new HashMap<>();
 		HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> supertablaUtt_list=new HashMap<>();
+		HashMap<String,HashMap<String,String>> Sem_Term_CUI=new HashMap<String,HashMap<String,String>>();
 		
 		System.out.println("//Procesando el Sample");
 		
@@ -122,7 +123,7 @@ public abstract class LoadCollectionUMLSVProtoBase extends LoadCollection{
 			procesaSalida(Salida_File,Terminos_Filtrados_File,
 					DocumentosList,DocumentosListText,Supertabla,
 					SupertablaSemPos,SupertablaSemNeg,TablaSemanticaTexto,
-					SupertablaUtt,supertablaUtt_list,
+					SupertablaUtt,supertablaUtt_list,Sem_Term_CUI,
 					Salida,Reducido);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -135,7 +136,7 @@ public abstract class LoadCollectionUMLSVProtoBase extends LoadCollection{
 		
 		System.out.println("//Generando coleccion Clavy");
 		
-		processCollecccion(DocumentosList,DocumentosListText,Supertabla,SupertablaSemPos,TablaSemanticaTexto,imagenes_Tabla,Salida,SupertablaUtt,supertablaUtt_list);
+		processCollecccion(DocumentosList,DocumentosListText,Supertabla,SupertablaSemPos,TablaSemanticaTexto,imagenes_Tabla,Salida,SupertablaUtt,supertablaUtt_list,Sem_Term_CUI);
 		
 		return Salida;
 	}
@@ -147,7 +148,8 @@ public abstract class LoadCollectionUMLSVProtoBase extends LoadCollection{
 			   HashMap<String, HashMap<String, HashSet<String>>> supertablaSemPos, HashMap<String, String> TablaSemanticaTexto,
 			   HashMap<String, HashSet<String>> imagenes_Tabla, CompleteCollectionAndLog Salida,
 			   HashMap<String, HashMap<String, HashMap<String, HashMap<String,HashSet<String>>>>> SupertablaUtt,
-			   HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> supertablaUtt_list);
+			   HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> supertablaUtt_list,
+			   HashMap<String,HashMap<String,String>> Sem_Term_CUI);
 	
 //	private static void procesaSalida(String filein,String filteredTerms, List<String> Lista,
 //	HashMap<String,String> documentosListTextIn,
@@ -170,6 +172,7 @@ public abstract class LoadCollectionUMLSVProtoBase extends LoadCollection{
 			HashMap<String,String> TablaSemanticaTexto,
 			HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> SupertablaUtt,
 			HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>> supertablaUtt_list,
+			HashMap<String,HashMap<String,String>> Sem_Term_CUI,
 			CompleteCollectionAndLog Salida,
 			String Reducido)
 					throws XMLStreamException, FactoryConfigurationError, IOException {
@@ -177,7 +180,7 @@ public abstract class LoadCollectionUMLSVProtoBase extends LoadCollection{
 
 		HashMap<String, String> TablaSemanticaTextoInversa = new HashMap<String,String>();
 		HashMap<String,List<String>> TablaSemanticaTextoValidas=new HashMap<String,List<String>>();
-		HashMap<String,HashMap<String,String>> Sem_Term_CUI=new HashMap<String,HashMap<String,String>>();
+		
 		
 //		try {
 //			
